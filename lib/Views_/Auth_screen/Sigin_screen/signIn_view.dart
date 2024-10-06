@@ -20,6 +20,8 @@ import 'controller/login_controller.dart';
 class MobileEmail extends StatelessWidget {
   const MobileEmail({super.key});
 
+
+
   @override
   Widget build(BuildContext context) {
     return CustomBackground(
@@ -157,12 +159,16 @@ class LoginScreen extends StatelessWidget {
                     ),
                   ),
                   SizedBox(height: 48.h),
-                  CustomButton(
-                    width: MediaQuery.of(context).size.width * 0.8,
-                    text: "Continue",
-                    onPressed: () {
-                      Get.to(() => OtpScreen());
-                    },
+                  GetBuilder<LoginController>(
+                    builder: (v) {
+                      return CustomButton(
+                        width: MediaQuery.of(context).size.width * 0.8,
+                        text: "Continue",
+                        onPressed: () {
+                          v.signInSignUpApi();
+                        },
+                      );
+                    }
                   ),
                 ],
               )),

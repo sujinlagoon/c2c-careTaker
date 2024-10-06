@@ -1,3 +1,4 @@
+import 'package:care2caretaker/Views_/Auth_screen/Sigin_screen/signIn_view.dart';
 import 'package:care2caretaker/Views_/Document_Upload/document_uploadView.dart';
 import 'package:care2caretaker/Views_/patient_history/patients_history.dart';
 import 'package:care2caretaker/reuse_widgets/AppColors.dart';
@@ -5,6 +6,7 @@ import 'package:care2caretaker/reuse_widgets/appBar.dart';
 import 'package:care2caretaker/reuse_widgets/customLabel.dart';
 import 'package:care2caretaker/reuse_widgets/image_background.dart';
 import 'package:care2caretaker/reuse_widgets/sizes.dart';
+import 'package:care2caretaker/sharedPref/sharedPref.dart';
 import 'package:enefty_icons/enefty_icons.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -123,8 +125,8 @@ class ProfileDetails extends StatelessWidget {
                 iconColor: Colors.red,
                 heading: "Patient History",
                 message: "View Your Patients",
-                callback: (){
-                  Get.to(()=>PatientsHistory());
+                callback: () {
+                  Get.to(() => PatientsHistory());
                 },
               ),
               Divider(),
@@ -165,6 +167,10 @@ class ProfileDetails extends StatelessWidget {
               Divider(),
               kHeight10,
               ProfileDetailsCustom(
+                callback: () async {
+                  await SharedPref().logout();
+                  Get.offAll(() => MobileEmail());
+                },
                 icons: EneftyIcons.logout_bold,
                 iconColor: Color(0xff002574),
                 heading: "Logout",

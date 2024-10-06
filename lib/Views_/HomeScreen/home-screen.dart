@@ -1,20 +1,25 @@
 import 'dart:ui';
 
+import 'package:care2caretaker/Views_/HomeScreen/controller/home_controller.dart';
 import 'package:custom_rating_bar/custom_rating_bar.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:get/get.dart';
+import 'package:get/get_core/src/get_main.dart';
+import 'package:get/get_state_manager/src/simple/get_state.dart';
 import 'package:iconly/iconly.dart';
 
-import '../../../reuse_widgets/AppColors.dart';
-import '../../../reuse_widgets/Custom_AppoinMents.dart';
-import '../../../reuse_widgets/appBar.dart';
-import '../../../reuse_widgets/customLabel.dart';
-import '../../../reuse_widgets/sizes.dart';
-
+import '../../reuse_widgets/AppColors.dart';
+import '../../reuse_widgets/Custom_AppoinMents.dart';
+import '../../reuse_widgets/appBar.dart';
+import '../../reuse_widgets/customLabel.dart';
+import '../../reuse_widgets/sizes.dart';
 
 class HomePage extends StatelessWidget {
   HomePage({super.key});
+
+  HomeController hm = Get.put(HomeController());
 
   @override
   Widget build(BuildContext context) {
@@ -32,7 +37,7 @@ class HomePage extends StatelessWidget {
           ),
         ),
         child: Padding(
-          padding: EdgeInsets.symmetric(horizontal: 25.w),
+          padding: EdgeInsets.symmetric(horizontal: 10.w),
           child: SingleChildScrollView(
             child: Column(
               children: [
@@ -61,8 +66,14 @@ class HomePage extends StatelessWidget {
                   decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(10.r),
                       gradient: new LinearGradient(
-                          colors: [Color(0xff52AAFC), Color(0xff41A2FD),],
-                          stops: [0.9, 1.6],
+                          colors: [
+                            Color(0xff52AAFC),
+                            Color(0xff41A2FD),
+                          ],
+                          stops: [
+                            0.9,
+                            1.6
+                          ],
                           begin: FractionalOffset.topCenter,
                           end: FractionalOffset.bottomCenter,
                           tileMode: TileMode.repeated)),
@@ -71,7 +82,7 @@ class HomePage extends StatelessWidget {
                       Expanded(
                           flex: 5,
                           child: Padding(
-                            padding:  EdgeInsets.only(left: 12.w),
+                            padding: EdgeInsets.only(left: 12.w),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
@@ -92,57 +103,58 @@ class HomePage extends StatelessWidget {
                                       fontSize: 17.sp),
                                 ),
                                 kHeight10,
-            
-                              ClipRRect(
-                                child: BackdropFilter(
-                                  filter: ImageFilter.blur(sigmaX: 3, sigmaY: 3),
-                                  child: Container(
-                                    padding: EdgeInsets.all(3.r),
-                                    decoration: BoxDecoration(
-                                      gradient: LinearGradient(
-                                        colors: [
-                                          Colors.white.withOpacity(0.1),
-                                          Colors.white.withOpacity(0.1),
-                                        ],
-                                        /*begin: AlignmentDirectional.topStart,
+                                ClipRRect(
+                                  child: BackdropFilter(
+                                    filter:
+                                        ImageFilter.blur(sigmaX: 3, sigmaY: 3),
+                                    child: Container(
+                                      padding: EdgeInsets.all(3.r),
+                                      decoration: BoxDecoration(
+                                        gradient: LinearGradient(
+                                          colors: [
+                                            Colors.white.withOpacity(0.1),
+                                            Colors.white.withOpacity(0.1),
+                                          ],
+                                          /*begin: AlignmentDirectional.topStart,
                                         end: AlignmentDirectional.bottomEnd,*/
+                                        ),
+                                        borderRadius: BorderRadius.all(
+                                            Radius.circular(2.r)),
                                       ),
-                                      borderRadius: BorderRadius.all(Radius.circular(2.r)),
-            
-                                    ),
-                                    child: Row(
-                                      children: [
-                                        Icon(IconlyLight.calendar,color: Colors.white,),
-                                        SizedBox(width: 5.w,),
-                                        Text("Aug 5  9:00AM",style: TextStyle(
-                                          color: Colors.white
-                                        ),)
-                                      ],
+                                      child: Row(
+                                        children: [
+                                          Icon(
+                                            IconlyLight.calendar,
+                                            color: Colors.white,
+                                          ),
+                                          SizedBox(
+                                            width: 5.w,
+                                          ),
+                                          Text(
+                                            "Aug 5  9:00AM",
+                                            style:
+                                                TextStyle(color: Colors.white),
+                                          )
+                                        ],
+                                      ),
                                     ),
                                   ),
-                                ),
-                              )
-            
+                                )
                               ],
-            
-            
                             ),
                           )),
                       Flexible(
-            flex: 5,
+                          flex: 5,
                           child: Padding(
-                            padding:  EdgeInsets.only(top: 18.h),
+                            padding: EdgeInsets.only(top: 18.h),
                             child: Image.asset(
                               fit: BoxFit.cover,
                               "assets/images/female-nurse-hospital 1.png",
-            
                             ),
                           )),
                     ],
                   ),
                 ),
-            
-            
                 kHeight10,
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -159,32 +171,46 @@ class HomePage extends StatelessWidget {
                       fontSize: 15.sp,
                       color: AppColors.primaryColor,
                     ),
-            
-            
                   ],
                 ),
                 kHeight10,
-                 CustomCareTakers(
-                   name: "Habeeba Mohamed",
-                   hospital: "Ak hospital",
-                   initial: 2,
-                   imageUrl: "assets/images/Rectangle 4481.png",
-                 ),
+                GetBuilder<HomeController>(builder: (v) {
+                  return ListView.builder(
+                      shrinkWrap: true,
+                      physics: NeverScrollableScrollPhysics(),
+                      itemCount: v.viewAllCareTakers.length,
+                      itemBuilder: (BuildContext context, index) {
+                        var data = v.viewAllCareTakers[index];
+                        var fullName =
+                            '${data.firstName ?? ''} ${data.lastName ?? ''}'
+                                .trim();
+                        return CustomCareTakers(
+                          name: fullName,
+                          hospital: "Ak hospital",
+                          initial: 2,
+                          imageUrl: "assets/images/Rectangle 4481.png",
+                        );
+                      });
+                }),
+                /* CustomCareTakers(
+                  name: "Habeeba Mohamed",
+                  hospital: "Ak hospital",
+                  initial: 2,
+                  imageUrl: "assets/images/Rectangle 4481.png",
+                ),
                 kHeight10,
-                 CustomCareTakers(
-                   name: "Habeeba Mohamed",
-                   hospital: "Ak hospital",
-                   imageUrl: 'assets/images/Rectangle 4482.png',
-                 ),
+                CustomCareTakers(
+                  name: "Habeeba Mohamed",
+                  hospital: "Ak hospital",
+                  imageUrl: 'assets/images/Rectangle 4482.png',
+                ),
                 kHeight10,
-                 CustomCareTakers(
-                   name: "Habeeba Mohamed",
-                   hospital: "Ak hospital",
-                   initial: 4,
-                   imageUrl: 'assets/images/Rectangle 4486.png',
-                 ),
-            
-            
+                CustomCareTakers(
+                  name: "Habeeba Mohamed",
+                  hospital: "Ak hospital",
+                  initial: 4,
+                  imageUrl: 'assets/images/Rectangle 4486.png',
+                ),*/
                 kHeight10,
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -201,8 +227,6 @@ class HomePage extends StatelessWidget {
                       fontSize: 15.sp,
                       color: AppColors.primaryColor,
                     ),
-            
-            
                   ],
                 ),
                 kHeight10,
@@ -210,11 +234,10 @@ class HomePage extends StatelessWidget {
                   appointmentDate: "Sun Aug 08",
                   appointmentTime: '10:00-11:00 AM',
                   doctorDesignation: "Ortho",
-                  doctorName:"Sheeba",
+                  doctorName: "Sheeba",
                   imageUrl: 'assets/images/profile.jpg',
                 ),
                 kHeight30,
-            
               ],
             ),
           ),
@@ -223,11 +246,8 @@ class HomePage extends StatelessWidget {
     );
   }
 
-  // custom TopCareTaker
-
+// custom TopCareTaker
 }
-
-
 
 // Custom Stateless Widget
 class CustomCareTakers extends StatelessWidget {

@@ -1,6 +1,5 @@
-
-
 import 'package:auto_size_text/auto_size_text.dart';
+import 'package:care2caretaker/Views_/Profile/Controller/profileController.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
@@ -14,9 +13,16 @@ import '../../reuse_widgets/customButton.dart';
 import '../Profile/profile_view.dart';
 import 'Controller/otp_controller.dart';
 
-class OtpScreen extends StatelessWidget {
-  OtpScreen({super.key});
+class OtpScreen extends StatefulWidget {
+  String PhoneNumber;
 
+  OtpScreen({super.key, required this.PhoneNumber});
+
+  @override
+  State<OtpScreen> createState() => _OtpScreenState();
+}
+
+class _OtpScreenState extends State<OtpScreen> {
   OtpController vc = Get.put(OtpController());
 
   @override
@@ -62,7 +68,8 @@ class OtpScreen extends StatelessWidget {
                             color: Colors.grey.shade600),
                       )),
                   SizedBox(height: 20.h),
-                  SizedBox(height: 40.h,
+                  SizedBox(
+                    height: 40.h,
                     width: MediaQuery.of(context).size.width * 0.6,
                     child: PinCodeTextField(
                       readOnly: true,
@@ -72,7 +79,8 @@ class OtpScreen extends StatelessWidget {
                       pinTheme: PinTheme(
                         inactiveColor: Colors.grey.shade600,
                         inactiveFillColor: Colors.white,
-                        borderWidth: 0.sp,errorBorderColor: Colors.red,
+                        borderWidth: 0.sp,
+                        errorBorderColor: Colors.red,
                         fieldOuterPadding:
                             EdgeInsets.symmetric(horizontal: 2.w),
                         activeBorderWidth: 0,
@@ -102,8 +110,8 @@ class OtpScreen extends StatelessWidget {
                   ),
                   SizedBox(height: 10.h),
                   SizedBox(
-                    width: MediaQuery.of(context).size.width*0.60,
-                    child:const Align(
+                    width: MediaQuery.of(context).size.width * 0.60,
+                    child: const Align(
                       alignment: Alignment.centerRight,
                       child: Text(
                         "Resend code",
@@ -114,13 +122,16 @@ class OtpScreen extends StatelessWidget {
                     ),
                   ),
                   SizedBox(height: 40.h),
-                  CustomButton(
-                    width: MediaQuery.of(context).size.width * 0.8,
-                    text: "Continue",
-                    onPressed: () {
-                      Get.to(()=>const ProfileView());
-                    },
-                  ),
+                  GetBuilder<OtpController>(builder: (b) {
+                    return CustomButton(
+                      width: MediaQuery.of(context).size.width * 0.8,
+                      text: "Continue",
+                      onPressed: () async{
+                        b.checkOtp(widget.PhoneNumber);
+                        await ProfileController().fetchCareTakerDetails();
+                      },
+                    );
+                  }),
                   SizedBox(height: 8.h),
                 ],
               )),

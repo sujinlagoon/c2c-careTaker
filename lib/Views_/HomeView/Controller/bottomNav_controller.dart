@@ -7,7 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:iconly/iconly.dart';
 
-import '../../HomeScreen/controller/home-screen.dart';
+import '../../HomeScreen/home-screen.dart';
 import '../../PatientRequest/PatientRequest_view.dart';
 
 class BottomNavController extends GetxController {

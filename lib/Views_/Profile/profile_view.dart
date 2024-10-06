@@ -1,3 +1,4 @@
+import 'package:care2caretaker/Views_/Profile/Controller/profileController.dart';
 import 'package:dotted_border/dotted_border.dart';
 import 'package:enefty_icons/enefty_icons.dart';
 import 'package:flutter/cupertino.dart';
@@ -14,7 +15,9 @@ import '../../reuse_widgets/sizes.dart';
 import '../HomeView/home_view.dart';
 
 class ProfileView extends StatelessWidget {
-  const ProfileView({super.key});
+  ProfileView({super.key});
+
+  final ProfileController PC = Get.put(ProfileController());
 
   @override
   Widget build(BuildContext context) {
@@ -22,133 +25,175 @@ class ProfileView extends StatelessWidget {
         appBar: CustomAppBar(title: "Profile", actions: [
           Padding(
             padding: const EdgeInsets.only(right: 18.0),
-            child: IconButton(
-              onPressed: () {
-                Get.to(() => HomeView());
-              },
-              icon: const Icon(
-                IconlyLight.tick_square,
-              ),
-              color: AppColors.primaryColor,
-            ),
+            child: GetBuilder<ProfileController>(builder: (v) {
+              return IconButton(
+                onPressed: () {
+                  if (v.profileInfo == null) {
+                    v.insertCaretakerProfileDetails(); // Insert new details
+                  } else {
+                    v.updateCaretakerProfileDetails(); // Update existing details
+                  }
+                },
+                icon: const Icon(
+                  IconlyLight.tick_square,
+                ),
+                color: AppColors.primaryColor,
+              );
+            }),
           ),
         ]),
         child: Padding(
           padding: EdgeInsets.symmetric(horizontal: 20.r),
           child: SingleChildScrollView(
-            child: Column(
-              children: [
-                SizedBox(height: 5.h),
-                customTextField(
-                  context,
-                  labelText: "Full Name",
-                ),
-                SizedBox(height: 15.h),
-                Row(
-                  children: [
-                    Expanded(
+            child: GetBuilder<ProfileController>(builder: (v) {
+              return Column(
+                children: [
+                  SizedBox(height: 5.h),
+                  GetBuilder<ProfileController>(
+                    builder: (o) {
+                      return customTextField(context,
+                          labelText: "First Name",
+                          controller: o.firstNameController);
+                    }
+                  ),
+                  SizedBox(height: 15.h),
+                  customTextField(context,
+                      labelText: "Last Name", controller: v.lastNameController),
+                  SizedBox(height: 15.h),
+                  GetBuilder<ProfileController>(builder: (v) {
+                    return customTextField(
+                      context,
+                      suffix: IconButton(
+                          onPressed: () {
+                            v.selectDob(context);
+                          },
+                          icon: Icon(
+                            Icons.calendar_month,
+                            color: AppColors.primaryColor,
+                          )),
+                      controller: v.dobController,
+                      labelText: "Date of Birth",
+                    );
+                  }),
+                  kHeight20,
+                  Row(
+                    children: [
+                      Expanded(
+                          flex: 5,
+                          child: customTextField(context,
+                              labelText: "Sex", controller: v.sexController)),
+                      kWidth20,
+                      Flexible(
                         flex: 5,
-                        child: customTextField(context, labelText: "Sex")),
-                    kWidth20,
-                    Flexible(
-                      flex: 5,
-                      child: customTextField(context, labelText: "Age"),
-                    ),
-                  ],
-                ),
-                kHeight20,
-                customTextField(
-                  context,
-                  labelText: "Date of Birth",
-                ),
-                kHeight20,
-                Row(
-                  children: [
-                    Expanded(
-                        flex: 5,
-                        child: customTextField(context, labelText: "Location")),
-                    kWidth15,
-                    Flexible(
-                        child: GestureDetector(
-                      onTap: () {},
-                      child: Container(
-                        height: 40,
-                        width: 40,
-                        color: AppColors.primaryColor,
-                        child: const Icon(
-                          Icons.add_location_alt,
-                          color: Colors.white,
-                        ),
+                        child: customTextField(context,
+                            readOnly: true,
+                            labelText: "Age",
+                            controller: v.ageController),
                       ),
-                    )),
-                  ],
-                ),
-                kHeight20,
-                customTextField(
-                  context,
-                  labelText: "Nationality",
-                ),
-                kHeight20,
-                customTextField(
-                  context,
-                  labelText: "Medical License",
-                ),
-                kHeight20,
-                customTextField(
-                  context,
-                  labelText: "Experience",
-                ),
-                kHeight20,
-                DottedBorder(
-                    color: Colors.grey,
-                    child: Container(
-                      height: MediaQuery.of(context).size.height * 0.15,
-                      width: MediaQuery.of(context).size.width,
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                      ),
-                      child: Column(
-                        children: [
-                          kHeight5,
-                          CircleAvatar(
-                            backgroundColor: Colors.grey.withOpacity(0.1),
-                            radius: 22,
-                            child: Icon(
-                              EneftyIcons.document_upload_outline,
-                              color: AppColors.primaryColor,
+                    ],
+                  ),
+                  kHeight20,
+                  Row(
+                    children: [
+                      Expanded(
+                          flex: 5,
+                          child: customTextField(context,
+                              controller: v.locationController,
+                              labelText: "Location")),
+                      kWidth15,
+                      Flexible(
+                          child: GetBuilder<ProfileController>(builder: (v) {
+                        return GestureDetector(
+                          onTap: () {
+                            v.getCurrentLocation();
+                          },
+                          child: Container(
+                            height: 40,
+                            width: 40,
+                            color: AppColors.primaryColor,
+                            child: const Icon(
+                              Icons.add_location_alt,
+                              color: Colors.white,
                             ),
                           ),
-                          TextButton(
-                              onPressed: () {
-                                // Get.to(() => AddressView());
-                              },
-                              child: Text(
-                                "Click to upload",
-                                style: TextStyle(color: AppColors.primaryColor),
-                              )),
-                          Text("Max File size")
-                        ],
-                      ),
-                    )),
-                kHeight20,
-                customTextField(
-                  context,
-                  maxLines: 3,
-                  labelText: "Address",
-                ),
-                kHeight20,
-                customTextField(
-                  context,
-                  labelText: "Primary Contact Number",
-                ),
-                kHeight20,
-                customTextField(
-                  context,
-                  labelText: "Secondary Contact",
-                ),
-                kHeight20,
-              ],
-            ),
+                        );
+                      })),
+                    ],
+                  ),
+                  kHeight20,
+                  customTextField(
+                    context,
+                    controller: v.nationalityController,
+                    labelText: "Nationality",
+                  ),
+                  kHeight20,
+                  customTextField(
+                    context,
+                    controller: v.medicalLicenseController,
+                    labelText: "Medical License",
+                  ),
+                  kHeight20,
+                  customTextField(
+                    context,
+                    controller: v.yearOfExperienceController,
+                    labelText: "Experience",
+                  ),
+                  kHeight20,
+                  DottedBorder(
+                      color: Colors.grey,
+                      child: Container(
+                        height: MediaQuery.of(context).size.height * 0.15,
+                        width: MediaQuery.of(context).size.width,
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                        ),
+                        child: Column(
+                          children: [
+                            kHeight5,
+                            CircleAvatar(
+                              backgroundColor: Colors.grey.withOpacity(0.1),
+                              radius: 22,
+                              child: Icon(
+                                EneftyIcons.document_upload_outline,
+                                color: AppColors.primaryColor,
+                              ),
+                            ),
+                            TextButton(
+                                onPressed: () {
+                                  // Get.to(() => AddressView());
+                                },
+                                child: Text(
+                                  "Click to upload",
+                                  style:
+                                      TextStyle(color: AppColors.primaryColor),
+                                )),
+                            Text("Max File size")
+                          ],
+                        ),
+                      )),
+                  kHeight20,
+                  customTextField(
+                    context,
+                    maxLines: 3,
+                    controller: v.addressController,
+                    labelText: "Address",
+                  ),
+                  kHeight20,
+                  customTextField(
+                    context,
+                    controller: v.primaryContactController,
+                    labelText: "Primary Contact Number",
+                  ),
+                  kHeight20,
+                  customTextField(
+                    context,
+                    controller: v.secondaryContactController,
+                    labelText: "Secondary Contact",
+                  ),
+                  kHeight20,
+                ],
+              );
+            }),
           ),
         ));
   }

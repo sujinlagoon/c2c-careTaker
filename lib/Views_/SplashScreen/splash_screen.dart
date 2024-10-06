@@ -1,5 +1,4 @@
-
-
+import 'package:care2caretaker/sharedPref/sharedPref.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
@@ -11,6 +10,8 @@ import '../../reuse_widgets/image_background.dart';
 import '../../reuse_widgets/loader.dart';
 import '../../reuse_widgets/sizes.dart';
 import '../Auth_screen/Sigin_screen/signIn_view.dart';
+import '../HomeScreen/home-screen.dart';
+import '../HomeView/home_view.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -20,14 +21,27 @@ class SplashScreen extends StatefulWidget {
 }
 
 class SplashScreenState extends State<SplashScreen> {
-
+  bool foundUser = false;
 
   @override
   void initState() {
     super.initState();
+    checkUserIsFound();
+  }
+
+  checkUserIsFound() async {
+    String? token = await SharedPref().getToken();
+    foundUser = token != null;
+    setState(() {
+      foundUser = token != null;
+    });
 
     Future.delayed(const Duration(seconds: 2), () {
-      Get.off(()=> MobileEmail());
+      if (foundUser) {
+        Get.off(() => HomeView());
+      } else {
+        Get.off(() => MobileEmail());
+      }
     });
   }
 
@@ -60,4 +74,3 @@ class SplashScreenState extends State<SplashScreen> {
     );
   }
 }
-
