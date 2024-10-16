@@ -14,12 +14,14 @@ class ProfileList {
   int? status;
   String? type;
   Data? data;
+  String? profilePath;
 
   ProfileList({
     this.success,
     this.status,
     this.type,
     this.data,
+    this.profilePath,
   });
 
   factory ProfileList.fromJson(Map<String, dynamic> json) => ProfileList(
@@ -27,6 +29,7 @@ class ProfileList {
         status: json["status"],
         type: json["type"],
         data: json["data"] == null ? null : Data.fromJson(json["data"]),
+        profilePath: json['profile_path'],
       );
 
   Map<String, dynamic> toJson() => {
@@ -34,6 +37,7 @@ class ProfileList {
         "status": status,
         "type": type,
         "data": data?.toJson(),
+        'profile_path': profilePath,
       };
 }
 
@@ -42,6 +46,7 @@ class Data {
   String? mobilenum;
   String? otp;
   int? otpverified;
+  String? profileImage;
   DateTime? createdAt;
   DateTime? updatedAt;
   CaretakerInfo? caretakerInfo;
@@ -51,6 +56,7 @@ class Data {
     this.mobilenum,
     this.otp,
     this.otpverified,
+    this.profileImage,
     this.createdAt,
     this.updatedAt,
     this.caretakerInfo,
@@ -60,6 +66,7 @@ class Data {
         id: json["id"],
         mobilenum: json["mobilenum"],
         otp: json["otp"],
+        profileImage: json['profile_image_url'],
         otpverified: json["otpverified"],
         createdAt: json["created_at"] == null
             ? null
@@ -77,6 +84,7 @@ class Data {
         "mobilenum": mobilenum,
         "otp": otp,
         "otpverified": otpverified,
+        'profile_image_url': profileImage,
         "created_at": createdAt?.toIso8601String(),
         "updated_at": updatedAt?.toIso8601String(),
         "caretaker_info": caretakerInfo?.toJson(),
@@ -91,10 +99,13 @@ class CaretakerInfo {
   String? sex;
   int? age;
   DateTime? dob;
+  String? email;
   String? medicalLicense;
   String? location;
   String? nationality;
   String? address;
+  String? serviceCharge;
+  String? totalPatientsAttended;
   String? uploadedDocuments;
   String? yearOfExperiences;
   String? primaryContactNumber;
@@ -108,12 +119,15 @@ class CaretakerInfo {
     this.firstName,
     this.lastName,
     this.sex,
+    this.email,
     this.age,
     this.dob,
     this.medicalLicense,
     this.location,
     this.nationality,
     this.address,
+    this.serviceCharge,
+    this.totalPatientsAttended,
     this.uploadedDocuments,
     this.yearOfExperiences,
     this.primaryContactNumber,
@@ -129,6 +143,7 @@ class CaretakerInfo {
         lastName: json["last_name"],
         sex: json["sex"],
         age: json["age"],
+        email: json['email'],
         dob: json["dob"] == null ? null : DateTime.parse(json["dob"]),
         medicalLicense: json["medical_license"],
         location: json["location"],
@@ -138,6 +153,8 @@ class CaretakerInfo {
         yearOfExperiences: json["year_of_experiences"],
         primaryContactNumber: json["primary_contact_number"],
         secondaryContactNumber: json["secondary_contact_number"],
+        serviceCharge: json["service_charge"],
+        totalPatientsAttended: json["total_patients_attended"],
         createdAt: json["created_at"] == null
             ? null
             : DateTime.parse(json["created_at"]),
@@ -153,6 +170,7 @@ class CaretakerInfo {
         "last_name": lastName,
         "sex": sex,
         "age": age,
+        'email': email,
         "dob":
             "${dob!.year.toString().padLeft(4, '0')}-${dob!.month.toString().padLeft(2, '0')}-${dob!.day.toString().padLeft(2, '0')}",
         "medical_license": medicalLicense,
@@ -163,6 +181,8 @@ class CaretakerInfo {
         "year_of_experiences": yearOfExperiences,
         "primary_contact_number": primaryContactNumber,
         "secondary_contact_number": secondaryContactNumber,
+        "service_charge": serviceCharge,
+        "total_patients_attended": totalPatientsAttended,
         "created_at": createdAt?.toIso8601String(),
         "updated_at": updatedAt?.toIso8601String(),
       };

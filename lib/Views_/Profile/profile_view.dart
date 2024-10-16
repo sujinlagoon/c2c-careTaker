@@ -26,19 +26,32 @@ class ProfileView extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.only(right: 18.0),
             child: GetBuilder<ProfileController>(builder: (v) {
-              return IconButton(
-                onPressed: () {
-                  if (v.profileInfo == null) {
-                    v.insertCaretakerProfileDetails(); // Insert new details
-                  } else {
-                    v.updateCaretakerProfileDetails(); // Update existing details
-                  }
-                },
-                icon: const Icon(
-                  IconlyLight.tick_square,
-                ),
-                color: AppColors.primaryColor,
-              );
+              return v.isLoading
+                  ? Center(
+                      child: SizedBox(
+                        height: 20.h,
+                        width: 23.w,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 1,
+                          color: AppColors.primaryColor,
+                        ),
+                      ),
+                    )
+                  : InkWell(
+                      onTap: () {
+                        if (v.profileInfo == null) {
+                          debugPrint("insertMethod");
+                          v.insertCaretakerProfileDetails();
+                        } else {
+                          debugPrint("updateMethod");
+                          v.updateCaretakerProfileDetails();
+                        }
+                      },
+                      child: Icon(
+                        IconlyLight.tick_square,
+                        color: AppColors.primaryColor,
+                      ),
+                    );
             }),
           ),
         ]),
@@ -49,16 +62,17 @@ class ProfileView extends StatelessWidget {
               return Column(
                 children: [
                   SizedBox(height: 5.h),
-                  GetBuilder<ProfileController>(
-                    builder: (o) {
-                      return customTextField(context,
-                          labelText: "First Name",
-                          controller: o.firstNameController);
-                    }
-                  ),
+                  GetBuilder<ProfileController>(builder: (o) {
+                    return customTextField(context,
+                        labelText: "First Name",
+                        controller: o.firstNameController);
+                  }),
                   SizedBox(height: 15.h),
                   customTextField(context,
                       labelText: "Last Name", controller: v.lastNameController),
+                  SizedBox(height: 15.h),
+                  customTextField(context,
+                      labelText: "E-mail", controller: v.emailCT),
                   SizedBox(height: 15.h),
                   GetBuilder<ProfileController>(builder: (v) {
                     return customTextField(
@@ -111,10 +125,21 @@ class ProfileView extends StatelessWidget {
                             height: 40,
                             width: 40,
                             color: AppColors.primaryColor,
-                            child: const Icon(
-                              Icons.add_location_alt,
-                              color: Colors.white,
-                            ),
+                            child: v.isLocation
+                                ? Center(
+                                    child: SizedBox(
+                                      height: 20.h,
+                                      width: 23.w,
+                                      child: CircularProgressIndicator(
+                                        strokeWidth: 0.7,
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                  )
+                                : const Icon(
+                                    Icons.add_location_alt,
+                                    color: Colors.white,
+                                  ),
                           ),
                         );
                       })),
@@ -177,6 +202,18 @@ class ProfileView extends StatelessWidget {
                     maxLines: 3,
                     controller: v.addressController,
                     labelText: "Address",
+                  ),
+                  kHeight20,
+                  customTextField(
+                    context,
+                    controller: v.costCT,
+                    labelText: "My Cost",
+                  ),
+                  kHeight20,
+                  customTextField(
+                    context,
+                    controller: TextEditingController(text: '${v.totalPatientsCT.text}+Patients'),
+                    labelText: "Total Patients Attended",
                   ),
                   kHeight20,
                   customTextField(

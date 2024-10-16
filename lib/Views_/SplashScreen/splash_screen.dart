@@ -4,7 +4,6 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
-
 import '../../reuse_widgets/AppColors.dart';
 import '../../reuse_widgets/image_background.dart';
 import '../../reuse_widgets/loader.dart';
@@ -26,18 +25,13 @@ class SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
-    checkUserIsFound();
+    tokenCheck();
   }
 
-  checkUserIsFound() async {
-    String? token = await SharedPref().getToken();
-    foundUser = token != null;
-    setState(() {
-      foundUser = token != null;
-    });
-
-    Future.delayed(const Duration(seconds: 2), () {
-      if (foundUser) {
+  tokenCheck() async {
+    bool isDetailsComplete = await SharedPref().getRegisterComplete();
+    Future.delayed(const Duration(seconds: 1), () {
+      if (isDetailsComplete) {
         Get.off(() => HomeView());
       } else {
         Get.off(() => MobileEmail());

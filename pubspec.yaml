@@ -19,7 +19,7 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 version: 1.0.0+1
 
 environment:
-  sdk: ^3.5.0
+  sdk: ">=3.0.0 <4.0.0"
 
 # Dependencies specify other packages that your package needs in order to work.
 # To automatically upgrade your package dependencies to the latest versions
@@ -42,7 +42,6 @@ dependencies:
   flutter_spinkit:
   flutter_svg:
   auto_size_text:
-  numpad:
   country_code_picker: ^3.0.0
   pin_code_fields: ^8.0.1
   iconly:
@@ -59,6 +58,13 @@ dependencies:
   fluttertoast:
   geolocator:
   geocoding:
+  firebase_core:
+  firebase_auth:
+  google_sign_in:
+  onscreen_num_keyboard: ^1.0.4
+  image_picker:
+  cached_network_image:
+  shimmer:
 
 
 dev_dependencies:

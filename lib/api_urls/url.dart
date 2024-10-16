@@ -13,6 +13,6 @@ class URls {
 
   String viewAllCareTakers = '$baseUrl/api/caretaker/caretaker/viewall';
 
-
+  String uploadImage = '$baseUrl/api/caretaker/caretaker/profile-img-upload';
 
 }

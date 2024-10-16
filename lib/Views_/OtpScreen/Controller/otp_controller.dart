@@ -6,29 +6,40 @@ import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 
+import '../../../reuse_widgets/customToast.dart';
 import '../../Profile/profile_view.dart';
 
 class OtpController extends GetxController {
   TextEditingController otpTEC = TextEditingController();
 
-  checkOtp(String ?mobilnum) async {
+  bool isLoading = false;
+
+  checkOtp(String? mobilnum) async {
+    if (otpTEC.text.length != 4) {
+      showCustomToast(message: "OTP must be exactly 4 digits");
+      return;
+    }
+    isLoading = true;
+    update();
     try {
       var res = await http.post(Uri.parse(URls().checkOtp), body: {
-        "mobilenum":mobilnum,
-        "otp":otpTEC.text,
+        "mobilenum": mobilnum,
+        "otp": otpTEC.text,
       });
-      if(res.statusCode==200){
+      if (res.statusCode == 200) {
         var json = jsonDecode(res.body);
         debugPrint("check otp body : $json");
         var token = json['token'];
-        await SharedPref().setToken(token);
+        await SharedPref().saveToken(token);
         debugPrint("otp check After Store Token $token");
-        Get.to(()=> ProfileView());
-      }else{
+        Get.to(() => ProfileView());
+      } else {
         debugPrint("otp check Not Successful");
       }
     } catch (e) {
       debugPrint(e.toString());
     }
+    isLoading = false;
+    update();
   }
 }

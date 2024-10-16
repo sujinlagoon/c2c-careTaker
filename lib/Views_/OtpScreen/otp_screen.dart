@@ -5,18 +5,17 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
-import 'package:numpad/numpad.dart';
+import 'package:onscreen_num_keyboard/onscreen_num_keyboard.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
-
 import '../../reuse_widgets/AppColors.dart';
 import '../../reuse_widgets/customButton.dart';
 import '../Profile/profile_view.dart';
 import 'Controller/otp_controller.dart';
 
 class OtpScreen extends StatefulWidget {
-  String PhoneNumber;
+  String phone;
 
-  OtpScreen({super.key, required this.PhoneNumber});
+  OtpScreen({super.key, required this.phone});
 
   @override
   State<OtpScreen> createState() => _OtpScreenState();
@@ -49,7 +48,7 @@ class _OtpScreenState extends State<OtpScreen> {
                   SizedBox(
                       width: MediaQuery.of(context).size.width * 0.8,
                       child: AutoSizeText(
-                        "Enter your mobile number",
+                        "Enter your 4 Digits otp",
                         textAlign: TextAlign.center,
                         maxLines: 1,
                         style: TextStyle(
@@ -124,12 +123,15 @@ class _OtpScreenState extends State<OtpScreen> {
                   SizedBox(height: 40.h),
                   GetBuilder<OtpController>(builder: (b) {
                     return CustomButton(
+                      isLoading: b.isLoading,
                       width: MediaQuery.of(context).size.width * 0.8,
                       text: "Continue",
-                      onPressed: () async{
-                        b.checkOtp(widget.PhoneNumber);
-                        await ProfileController().fetchCareTakerDetails();
-                      },
+                      onPressed: b.isLoading
+                          ? null
+                          : () async {
+                              b.checkOtp(widget.phone);
+                              // await ProfileController().fetchCareTakerDetails();
+                            },
                     );
                   }),
                   SizedBox(height: 8.h),
@@ -143,16 +145,8 @@ class _OtpScreenState extends State<OtpScreen> {
                     BoxDecoration(borderRadius: BorderRadius.circular(16)),
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(16),
-                  child: NumPad(
-                      backgroundColor: Colors.grey.shade100,
-                      buttonSize: 12,
-                      mainAxisSpacing: 12,
-                      textStyle: TextStyle(
-                        color: Colors.black,
-                        fontSize: 32.sp,
-                      ),
-                      numItemDecoration: const BoxDecoration(),
-                      onTap: (val) {
+                  child: NumericKeyboard(
+                      onKeyboardTap: (val) {
                         if (val == 99) {
                           if (vc.otpTEC.text.isEmpty) {
                             return;
@@ -163,7 +157,27 @@ class _OtpScreenState extends State<OtpScreen> {
                         }
                         vc.otpTEC.text = vc.otpTEC.text + val.toString();
                         debugPrint(vc.otpTEC.text);
-                      }),
+                      },
+                      textStyle: TextStyle(
+                          fontSize: 22.sp,
+                          color: Colors.black,
+                          fontWeight: FontWeight.bold),
+                      rightButtonFn: () {
+                        if (vc.otpTEC.text.isNotEmpty) {
+                          vc.otpTEC.text = vc.otpTEC.text
+                              .substring(0, vc.otpTEC.text.length - 1);
+                          vc.update();
+                        }
+                      },
+                      rightButtonLongPressFn: () {
+                        vc.otpTEC.clear();
+                        vc.update();
+                      },
+                      rightIcon: Icon(
+                        Icons.backspace,
+                        color: Colors.black,
+                      ),
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween),
                 ),
               ))
         ],

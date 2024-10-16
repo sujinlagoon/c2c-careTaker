@@ -1,44 +1,55 @@
-
-
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:country_code_picker/country_code_picker.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
-import 'package:get/get_core/src/get_main.dart';
-import 'package:numpad/numpad.dart';
+import 'package:onscreen_num_keyboard/onscreen_num_keyboard.dart';
 
 import '../../../reuse_widgets/customButton.dart';
 import '../../../reuse_widgets/custom_textfield.dart';
 import '../../../reuse_widgets/image_background.dart';
 import '../../../reuse_widgets/sizes.dart';
-import '../../OtpScreen/otp_screen.dart';
 import 'controller/login_controller.dart';
 
-class MobileEmail extends StatelessWidget {
-  const MobileEmail({super.key});
+class MobileEmail extends StatefulWidget {
+  MobileEmail({super.key});
 
+  @override
+  State<MobileEmail> createState() => _MobileEmailState();
+}
 
+class _MobileEmailState extends State<MobileEmail> {
+  bool isLoad = false;
 
   @override
   Widget build(BuildContext context) {
     return CustomBackground(
       child: Column(
         children: [
-          Expanded(flex: 2, child: Image.asset("assets/images/ctoc onboarding.png")),
+          Expanded(
+              flex: 2, child: Image.asset("assets/images/ctoc onboarding.png")),
           kHeight40,
           Flexible(
               //flex: 4,
               child: Column(
             children: [
               CustomButton(
+                isLoading: isLoad,
                 icon: Icons.phone_iphone_outlined,
                 text: 'Continue With Mobile',
-                onPressed: () {
-                  Get.  to(() => LoginScreen());
-                },
+                onPressed: isLoad
+                    ? null
+                    : () async {
+                        setState(() {
+                          isLoad = true;
+                        });
+                        await Future.delayed(Duration(seconds: 1));
+                        await Get.to(() => LoginScreen());
+                        setState(() {
+                          isLoad = false;
+                        });
+                      },
               ),
               SizedBox(height: 15.h),
               Padding(
@@ -99,115 +110,133 @@ class LoginScreen extends StatelessWidget {
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Expanded(
-              flex: 6,
-              child: Column(
-                children: [
-                  SizedBox(
-                    height: MediaQuery.of(context).size.height * 0.1,
+          Column(
+            children: [
+              SizedBox(
+                height: MediaQuery.of(context).size.height * 0.1,
+              ),
+              Center(
+                child: SvgPicture.asset(
+                  "assets/images/svg/logo.svg",
+                  width: MediaQuery.of(context).size.width * 0.2,
+                ),
+              ),
+              SizedBox(height: 20.h),
+              SizedBox(
+                  width: MediaQuery.of(context).size.width * 0.8,
+                  child: AutoSizeText(
+                    "Enter your mobile number",
+                    textAlign: TextAlign.center,
+                    maxLines: 1,
+                    style:
+                    TextStyle(fontSize: 22.sp, fontWeight: FontWeight.w700),
+                  )),
+              SizedBox(height: 20.h),
+              SizedBox(
+                  width: MediaQuery.of(context).size.width * 0.7,
+                  child: Text(
+                    "We will send you a verification code",
+                    textAlign: TextAlign.center,
+                    maxLines: null,
+                    style: TextStyle(
+                        fontSize: 12.sp,
+                        fontWeight: FontWeight.w500,
+                        color: Colors.grey.shade600),
+                  )),
+              SizedBox(height: 20.h),
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 22.r),
+                child: customTextField(
+                  context,
+                  prefix: GetBuilder<LoginController>(builder: (v) {
+                    return CountryCodePicker(
+                      onChanged: (countryCode) {
+                        v.countryCode = countryCode;
+                        v.update();
+                        print(countryCode);
+                      },
+                      initialSelection: 'IN',
+                      favorite: ['+91', 'FR'],
+                      showCountryOnly: false,
+                      showOnlyCountryWhenClosed: false,
+                      alignLeft: false,
+                      flagDecoration: BoxDecoration(shape: BoxShape.circle),
+                    );
+                  }),
+                  controller: lc.phoneCT,
+                  textStyle: TextStyle(
+                    fontSize: 17.sp,
                   ),
-                  Center(
-                    child: SvgPicture.asset(
-                      "assets/images/svg/logo.svg",
-                      width: MediaQuery.of(context).size.width * 0.2,
-                    ),
-                  ),
-                  SizedBox(height: 20.h),
-                  SizedBox(
-                      width: MediaQuery.of(context).size.width * 0.8,
-                      child: AutoSizeText(
-                        "Enter your mobile number",
-                        textAlign: TextAlign.center,
-                        maxLines: 1,
-                        style: TextStyle(
-                            fontSize: 22.sp, fontWeight: FontWeight.w700),
-                      )),
-                  SizedBox(height: 20.h),
-                  SizedBox(
-                      width: MediaQuery.of(context).size.width * 0.7,
-                      child: Text(
-                        "We will send you a verification code",
-                        textAlign: TextAlign.center,
-                        maxLines: null,
-                        style: TextStyle(
-                            fontSize: 12.sp,
-                            fontWeight: FontWeight.w500,
-                            color: Colors.grey.shade600),
-                      )),
-                  SizedBox(height: 20.h),
-                  Padding(
-                    padding:  EdgeInsets.symmetric(horizontal: 22.r),
-                    child: customTextField(
-                      context,
-                      prefix: CountryCodePicker(
-                        onChanged: print,
-                        initialSelection: 'US',
-                        favorite: ['+91', 'FR'],
-                        showCountryOnly: false,
-                        showOnlyCountryWhenClosed: false,
-                        alignLeft: false,
-                       flagDecoration: BoxDecoration(
-                      shape: BoxShape.circle
-                       ),
-                      ),
-                      controller: lc.phoneCT,
-                      textStyle: TextStyle(
-                        fontSize: 17.sp,
-                      ),
-                      labelText: 'Phone',
-                      readOnly: true,
-                    ),
-                  ),
-                  SizedBox(height: 48.h),
-                  GetBuilder<LoginController>(
-                    builder: (v) {
-                      return CustomButton(
-                        width: MediaQuery.of(context).size.width * 0.8,
-                        text: "Continue",
-                        onPressed: () {
-                          v.signInSignUpApi();
-                        },
-                      );
-                    }
-                  ),
-                ],
-              )),
-          Expanded(
-              flex: 4,
-              child: Container(
-                padding: EdgeInsets.all(16.r),
-                decoration:
-                    BoxDecoration(borderRadius: BorderRadius.circular(16)),
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(16),
-                  child: NumPad(
-                    backgroundColor: Colors.grey.shade100,
-                    buttonSize: 12,
-                    mainAxisSpacing: 12,
-                    textStyle: TextStyle(
-                      color: Colors.black,
-                      fontSize: 32.sp,
-                    ),
-                    numItemDecoration: const BoxDecoration(),
-                    onTap: (val) {
-                      if (val == 99) {
-                        if (lc.phoneCT.text.isEmpty) {
-                          return;
-                        }
-                        lc.phoneCT.text = lc.phoneCT.text
-                            .substring(0, lc.phoneCT.text.length - 1);
+                  labelText: 'Phone',
+                  readOnly: true,
+                ),
+              ),
+              SizedBox(height: 40.h),
+              GetBuilder<LoginController>(builder: (v) {
+                print(v.phoneCT.text);
+                return CustomButton(
+                  isLoading: v.isLoading,
+                  width: MediaQuery.of(context).size.width * 0.8,
+                  text: "Continue",
+                  onPressed: v.isLoading
+                      ? null
+                      : () => v.loginorRegister(context: context),
+                );
+              }),
+            ],
+          ),
+          Padding(
+            padding: const EdgeInsets.all(18.0),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(16),
+              child: NumericKeyboard(
+                  onKeyboardTap: (val) {
+                    // Get the selected country code
+                    String selectedCountryCode =
+                        lc.countryCode?.dialCode ?? '+91';
+                    int maxPhoneNumberLength =
+                        lc.phoneNumberLengths[selectedCountryCode] ?? 10;
+
+                    if (val == 99) {
+                      if (lc.phoneCT.text.isEmpty) {
                         return;
                       }
-                      if (lc.phoneCT.text.length == 10) {
+                      lc.phoneCT.text = lc.phoneCT.text
+                          .substring(0, lc.phoneCT.text.length - 1);
+                    } else {
+                      // Limit the phone number input based on the country's allowed digit length
+                      if (lc.phoneCT.text.length >= maxPhoneNumberLength) {
                         return;
                       }
                       lc.phoneCT.text = lc.phoneCT.text + val.toString();
-                      print(lc.phoneCT.text);
+                    }
+                    print(
+                        "Phone number: ${lc.phoneCT.text} (Country: $selectedCountryCode)");
+                    lc.update();
+                  },
+                  textStyle: TextStyle(
+                      fontSize: 22.sp,
+                      color: Colors.black,
+                      fontWeight: FontWeight.bold),
+                  rightButtonFn: () {
+                    if (lc.phoneCT.text.isNotEmpty) {
+                      lc.phoneCT.text = lc.phoneCT.text
+                          .substring(0, lc.phoneCT.text.length - 1);
                       lc.update();
-                    },
+                    }
+                  },
+                  rightButtonLongPressFn: () {
+                    lc.phoneCT.clear();
+                    lc.update();
+                  },
+                  rightIcon: Icon(
+                    Icons.backspace,
+                    color: Colors.black,
                   ),
-                ),
-              ))
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween),
+              clipBehavior: Clip.hardEdge,
+            ),
+          ),
         ],
       ),
     );
