@@ -64,6 +64,14 @@ class ProfileController extends GetxController {
     return age;
   }
 
+
+  //indicate details fill Completed
+
+  void onUserDetailsCompleted() {
+    SharedPref().setRegisterComplete(true);
+  }
+
+
   insertCaretakerProfileDetails() async {
     try {
       var careTakerId = await SharedPref().getId();
@@ -98,7 +106,7 @@ class ProfileController extends GetxController {
         },
       );
       if (res.statusCode == 200) {
-        debugPrint(res.body);
+        onUserDetailsCompleted();
         Get.to(() => HomeView());
         debugPrint("Successfully Insert care Taker Details");
       } else {
@@ -142,6 +150,7 @@ class ProfileController extends GetxController {
       },
     );
     if (res.statusCode == 200) {
+      onUserDetailsCompleted();
       Get.to(() => HomeView());
       debugPrint("Successfully update care Taker Details");
     } else {
@@ -168,10 +177,6 @@ class ProfileController extends GetxController {
           "Accept": "application/json",
         },
       );
-
-      debugPrint("Response status: ${res.statusCode}");
-      debugPrint("Response body: ${res.body}");
-
       if (res.statusCode == 200) {
         var decodeJson = jsonDecode(res.body);
         /*if (decodeJson['data'] != null) {*/
@@ -282,10 +287,7 @@ class ProfileController extends GetxController {
       String? patientId = await SharedPref().getId();
       String? token = await SharedPref().getToken();
       String fileName = path.basename(selectImage!.path);
-      debugPrint("File Name: $fileName");
-      var req =
-          await http.MultipartRequest('POST', Uri.parse(URls().uploadImage));
-      debugPrint(req.fields.toString());
+      var req = await http.MultipartRequest('POST', Uri.parse(URls().uploadImage));
       req.files.add(await http.MultipartFile.fromPath(
           'profile_image_url', selectImage!.path,
           filename: fileName));
@@ -310,6 +312,8 @@ class ProfileController extends GetxController {
     uploadLoading = false;
     update();
   }
+
+
 
   @override
   void onInit() {

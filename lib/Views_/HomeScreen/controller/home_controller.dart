@@ -2,6 +2,7 @@
 
 import 'package:care2caretaker/api_urls/url.dart';
 import 'package:care2caretaker/reuse_widgets/appBar.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 
 import 'package:get/get_state_manager/get_state_manager.dart';
@@ -15,7 +16,7 @@ class HomeController extends GetxController {
   AllCareTakers ?allCareTakers;
 
   viewAllCareTakersApi() async {
-//    try {
+   try {
     var token = await SharedPref().getToken();
     var result = await http.get(
       Uri.parse(URls().viewAllCareTakers),
@@ -25,17 +26,14 @@ class HomeController extends GetxController {
       },
     );
     if (result.statusCode == 200) {
-      print(result.body);
       allCareTakers = allCareTakersFromJson(result.body);
       viewAllCareTakers.addAll(allCareTakers!.data!.map((e)=>e.caretakerInfo!).toList());
-      viewAllCareTakers.forEach((e){
-        print(e.firstName);
-      });
+      viewAllCareTakers.forEach((e){});
       update();
     }
-    // } catch (e) {
-    //   debugPrint(e.toString());
-    // }
+    } catch (e) {
+      debugPrint(e.toString());
+    }
   }
 
   @override

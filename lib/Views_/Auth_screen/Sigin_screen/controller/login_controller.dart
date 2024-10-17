@@ -47,7 +47,6 @@ class LoginController extends GetxController {
       print("phoneCT $phoneCT");
       if (result.statusCode == 200) {
         var responseBody = jsonDecode(result.body);
-        debugPrint(responseBody.toString());
         var otp = responseBody['otp'];
         int patientId = responseBody['patient']['id'];
         await SharedPref().saveId(patientId.toString());

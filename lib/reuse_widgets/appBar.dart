@@ -64,13 +64,13 @@ class HomeAppBar extends StatelessWidget implements PreferredSizeWidget {
       child: AppBar(
         backgroundColor: Colors.white,
         // Adjust to match your design
-        elevation: 0,
+       /* elevation: 0,*/
         // Remove shadow for a flat design
         leading: Padding(
           padding: const EdgeInsets.only(left: 16.0, top: 8.0),
           child: CircleAvatar(
             radius: 20.0, // Adjust size as needed
-            backgroundImage: AssetImage(
+            backgroundImage: NetworkImage(
                 avatarUrl), // Replace with AssetImage for local images
           ),
         ),
