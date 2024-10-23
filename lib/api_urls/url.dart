@@ -15,4 +15,13 @@ class URls {
 
   String uploadImage = '$baseUrl/api/caretaker/caretaker/profile-img-upload';
 
+  String uploadDoc  = '$baseUrl/api/caretaker/caretaker/documents-upload';
+
+  String delDoc = '$baseUrl/api/caretaker/caretaker-info/delete';
+
+  String individualPatient = '$baseUrl/api/caretaker/caretaker/view-patient';
+
+  String viewRequests = '$baseUrl/api/caretaker/caretaker/appointment-requests';
+
+  String acceptRejectPatientRequest = '$baseUrl/api/caretaker/caretaker/approve-appointment';
 }

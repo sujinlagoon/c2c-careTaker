@@ -1,5 +1,5 @@
 import 'dart:convert';
-
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:care2caretaker/api_urls/url.dart';
 import 'package:care2caretaker/reuse_widgets/customToast.dart';
 import 'package:care2caretaker/sharedPref/sharedPref.dart';
@@ -18,6 +18,37 @@ class LoginController extends GetxController {
   GoogleSignIn googleSignIn = GoogleSignIn();
   bool isLoading = false;
   CountryCode? countryCode = CountryCode.fromDialCode('+91');
+  int? getOtp;
+
+  String? fcmToken;
+
+  void getFCMToken({required BuildContext context}) async {
+    FirebaseMessaging messaging = FirebaseMessaging.instance;
+
+    NotificationSettings settings = await messaging.requestPermission(
+      alert: true,
+      badge: true,
+      sound: true,
+    );
+
+    if (settings.authorizationStatus == AuthorizationStatus.authorized) {
+      try {
+        String? token = await messaging.getToken();
+        if (token != null) {
+          print("FCM Token: $token");
+          fcmToken = token;
+          loginorRegister(context: context);
+          update();
+        } else {
+          print("FCM Token is null");
+        }
+      } catch (e) {
+        print("Error retrieving FCM token: $e");
+      }
+    } else {
+      print("User declined notification permissions");
+    }
+  }
 
   loginorRegister({required BuildContext context}) async {
     isLoading = true;
@@ -40,18 +71,27 @@ class LoginController extends GetxController {
       update();
       return;
     }
+    if (fcmToken == null) {
+      showCustomToast(message: "FCM token is not available. Please try again.");
+      isLoading = false;
+      update();
+      return;
+    }
 
     try {
-      var result = await http.post(Uri.parse(URls().loginorsignup),
-          body: {'mobilenum': phoneCT.text});
+      var result = await http.post(Uri.parse(URls().loginorsignup), body: {
+        'mobilenum': phoneCT.text,
+        'fcm_token': fcmToken,
+      });
       print("phoneCT $phoneCT");
       if (result.statusCode == 200) {
         var responseBody = jsonDecode(result.body);
-        var otp = responseBody['otp'];
+        int getOtp = responseBody['otp'];
+        await SharedPref().saveOtp(getOtp.toString());
         int patientId = responseBody['patient']['id'];
         await SharedPref().saveId(patientId.toString());
-        debugPrint('your otp is : $otp');
-        showCustomToast(message: "your otp is $otp");
+        debugPrint('your otp is : $getOtp');
+        showCustomToast(message: "your otp is $getOtp");
         Get.to(() => OtpScreen(
               phone: phoneCT.text,
             ));
@@ -154,4 +194,9 @@ class LoginController extends GetxController {
     '+678': 7, // Vanuatu
     '+685': 5, // Samoa
   };
+
+  @override
+  void onInit() {
+    super.onInit();
+  }
 }

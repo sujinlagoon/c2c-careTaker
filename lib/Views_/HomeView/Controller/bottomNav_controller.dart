@@ -16,7 +16,7 @@ class BottomNavController extends GetxController {
     HomePage(),
     PatientrequestView(),
     ScheduleView(),
-    ChatListScreen(),
+    //ChatListScreen(),
     ProfileDetails()
   ];
   List<TabItem> items = [
@@ -29,9 +29,9 @@ class BottomNavController extends GetxController {
     TabItem(
       icon: IconlyBold.user_2,
     ),
-    TabItem(
+   /* TabItem(
       icon: Icons.chat_rounded,
-    ),
+    ),*/
     TabItem(
       icon: IconlyBold.profile,
     ),

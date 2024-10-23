@@ -41,6 +41,7 @@ class Datum {
   String? mobilenum;
   String? otp;
   int? otpverified;
+  String? profileImageUrl;
   DateTime? createdAt;
   DateTime? updatedAt;
   CaretakerInfo? caretakerInfo;
@@ -51,6 +52,7 @@ class Datum {
     this.otp,
     this.otpverified,
     this.createdAt,
+    this.profileImageUrl,
     this.updatedAt,
     this.caretakerInfo,
   });
@@ -60,6 +62,7 @@ class Datum {
     mobilenum: json["mobilenum"],
     otp: json["otp"],
     otpverified: json["otpverified"],
+    profileImageUrl: json["profile_image_url"],
     createdAt: json["created_at"] == null ? null : DateTime.parse(json["created_at"]),
     updatedAt: json["updated_at"] == null ? null : DateTime.parse(json["updated_at"]),
     caretakerInfo: json["caretaker_info"] == null ? null : CaretakerInfo.fromJson(json["caretaker_info"]),
@@ -70,6 +73,7 @@ class Datum {
     "mobilenum": mobilenum,
     "otp": otp,
     "otpverified": otpverified,
+    "profile_image_url": profileImageUrl,
     "created_at": createdAt?.toIso8601String(),
     "updated_at": updatedAt?.toIso8601String(),
     "caretaker_info": caretakerInfo?.toJson(),
@@ -83,6 +87,7 @@ class CaretakerInfo {
   String? lastName;
   String? sex;
   int? age;
+  String? email;
   DateTime? dob;
   String? medicalLicense;
   String? location;
@@ -91,6 +96,8 @@ class CaretakerInfo {
   String? uploadedDocuments;
   String? yearOfExperiences;
   String? primaryContactNumber;
+  String? serviceCharge;
+  String? totalPatientsAttended;
   String? secondaryContactNumber;
   DateTime? createdAt;
   DateTime? updatedAt;
@@ -102,11 +109,14 @@ class CaretakerInfo {
     this.lastName,
     this.sex,
     this.age,
+    this.email,
     this.dob,
     this.medicalLicense,
     this.location,
     this.nationality,
     this.address,
+    this.serviceCharge,
+    this.totalPatientsAttended,
     this.uploadedDocuments,
     this.yearOfExperiences,
     this.primaryContactNumber,
@@ -122,11 +132,14 @@ class CaretakerInfo {
     lastName: json["last_name"],
     sex: json["sex"],
     age: json["age"],
+    email: json["email"],
     dob: json["dob"] == null ? null : DateTime.parse(json["dob"]),
     medicalLicense: json["medical_license"],
     location: json["location"],
     nationality: json["nationality"],
     address: json["address"],
+    serviceCharge: json["service_charge"],
+    totalPatientsAttended: json["total_patients_attended"],
     uploadedDocuments: json["uploaded_documents"],
     yearOfExperiences: json["year_of_experiences"],
     primaryContactNumber: json["primary_contact_number"],
@@ -147,7 +160,10 @@ class CaretakerInfo {
     "location": location,
     "nationality": nationality,
     "address": address,
+    "email": email,
     "uploaded_documents": uploadedDocuments,
+    "service_charge": serviceCharge,
+    "total_patients_attended": totalPatientsAttended,
     "year_of_experiences": yearOfExperiences,
     "primary_contact_number": primaryContactNumber,
     "secondary_contact_number": secondaryContactNumber,

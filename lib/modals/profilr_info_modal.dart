@@ -4,6 +4,8 @@
 
 import 'dart:convert';
 
+import '../Views_/Document_Upload/controller/docUpload_controller.dart';
+
 ProfileList profileListFromJson(String str) =>
     ProfileList.fromJson(json.decode(str));
 
@@ -50,17 +52,20 @@ class Data {
   DateTime? createdAt;
   DateTime? updatedAt;
   CaretakerInfo? caretakerInfo;
+  List<CaretakerDocument>? caretakerDocuments;
+  List<PatientAppointment>? patientAppointments;
 
-  Data({
-    this.id,
-    this.mobilenum,
-    this.otp,
-    this.otpverified,
-    this.profileImage,
-    this.createdAt,
-    this.updatedAt,
-    this.caretakerInfo,
-  });
+  Data(
+      {this.id,
+      this.mobilenum,
+      this.otp,
+      this.otpverified,
+      this.profileImage,
+      this.createdAt,
+      this.updatedAt,
+      this.caretakerInfo,
+      this.caretakerDocuments,
+      this.patientAppointments});
 
   factory Data.fromJson(Map<String, dynamic> json) => Data(
         id: json["id"],
@@ -77,6 +82,14 @@ class Data {
         caretakerInfo: json["caretaker_info"] == null
             ? null
             : CaretakerInfo.fromJson(json["caretaker_info"]),
+        caretakerDocuments: json["caretaker_documents"] == null
+            ? []
+            : List<CaretakerDocument>.from(json["caretaker_documents"]
+                .map((x) => CaretakerDocument.fromJson(x))),
+        patientAppointments: json["patient_appointments"] == null
+            ? []
+            : List<PatientAppointment>.from(json["patient_appointments"]!
+                .map((x) => PatientAppointment.fromJson(x))),
       );
 
   Map<String, dynamic> toJson() => {
@@ -88,6 +101,12 @@ class Data {
         "created_at": createdAt?.toIso8601String(),
         "updated_at": updatedAt?.toIso8601String(),
         "caretaker_info": caretakerInfo?.toJson(),
+        "caretaker_documents": caretakerDocuments == null
+            ? []
+            : List<dynamic>.from(caretakerDocuments!.map((x) => x.toJson())),
+        "patient_appointments": patientAppointments == null
+            ? []
+            : List<dynamic>.from(patientAppointments!.map((x) => x.toJson())),
       };
 }
 
@@ -187,3 +206,66 @@ class CaretakerInfo {
         "updated_at": updatedAt?.toIso8601String(),
       };
 }
+
+class PatientAppointment {
+  int? id;
+  int? patientId;
+  int? caretakerId;
+  DateTime? appointmentDate;
+  String? appointmentStartTime;
+  String? appointmentEndTime;
+  String? serviceStatus;
+  String? paymentStatus;
+  DateTime? createdAt;
+  DateTime? updatedAt;
+
+  PatientAppointment({
+    this.id,
+    this.patientId,
+    this.caretakerId,
+    this.appointmentDate,
+    this.appointmentStartTime,
+    this.appointmentEndTime,
+    this.serviceStatus,
+    this.paymentStatus,
+    this.createdAt,
+    this.updatedAt,
+  });
+
+  factory PatientAppointment.fromJson(Map<String, dynamic> json) =>
+      PatientAppointment(
+        id: json["id"],
+        patientId: json["patient_id"],
+        caretakerId: json["caretaker_id"],
+        appointmentDate: json["appointment_date"] == null
+            ? null
+            : DateTime.parse(json["appointment_date"]),
+        appointmentStartTime: json["appointment_start_time"],
+        appointmentEndTime: json["appointment_end_time"],
+        serviceStatus: json["service_status"],
+        paymentStatus: json["payment_status"],
+        createdAt: json["created_at"] == null
+            ? null
+            : DateTime.parse(json["created_at"]),
+        updatedAt: json["updated_at"] == null
+            ? null
+            : DateTime.parse(json["updated_at"]),
+      );
+
+  Map<String, dynamic> toJson() => {
+        "id": id,
+        "patient_id": patientId,
+        "caretaker_id": caretakerId,
+        "appointment_date":
+            "${appointmentDate!.year.toString().padLeft(4, '0')}-${appointmentDate!.month.toString().padLeft(2, '0')}-${appointmentDate!.day.toString().padLeft(2, '0')}",
+        "appointment_start_time": appointmentStartTime,
+        "appointment_end_time": appointmentEndTime,
+        "service_status": serviceStatus,
+        "payment_status": paymentStatus,
+        "created_at": createdAt?.toIso8601String(),
+        "updated_at": updatedAt?.toIso8601String(),
+      };
+}
+
+
+

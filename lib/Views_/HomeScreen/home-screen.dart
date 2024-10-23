@@ -4,6 +4,7 @@ import 'package:care2caretaker/Views_/HomeScreen/controller/home_controller.dart
 import 'package:care2caretaker/Views_/Profile/Controller/profileController.dart';
 import 'package:care2caretaker/modals/profilr_info_modal.dart';
 import 'package:custom_rating_bar/custom_rating_bar.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -19,11 +20,35 @@ import '../../reuse_widgets/appBar.dart';
 import '../../reuse_widgets/customLabel.dart';
 import '../../reuse_widgets/sizes.dart';
 
-class HomePage extends StatelessWidget {
+class HomePage extends StatefulWidget {
   HomePage({super.key});
 
+  @override
+  State<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
   HomeController hm = Get.put(HomeController());
+
   ProfileController hc = Get.put(ProfileController());
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    // Listen for messages when the app is in the foreground
+    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+      print('Received a message while in the foreground: ${message.messageId}');
+      if (message.notification != null) {
+        print('Message contains a notification: ${message.notification}');
+        // You can show a custom notification using a package like flutter_local_notifications
+      }
+    });
+
+    FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
+      print('Notification clicked, app opened!');
+    });
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -37,7 +62,8 @@ class HomePage extends StatelessWidget {
       }
 
       var data = hc.profileList!.data!.caretakerInfo;
-      var full = (hc.profileList!.profilePath)! + (hc.profileList!.data!.profileImage!);
+      var full = (hc.profileList!.profilePath)! +
+          (hc.profileList!.data!.profileImage!);
       return Scaffold(
         appBar: HomeAppBar(
           username: data!.firstName!,
@@ -190,20 +216,21 @@ class HomePage extends StatelessWidget {
                   ),
                   kHeight10,
                   GetBuilder<HomeController>(builder: (v) {
+
                     return ListView.builder(
                         shrinkWrap: true,
                         physics: NeverScrollableScrollPhysics(),
                         itemCount: v.viewAllCareTakers.length,
                         itemBuilder: (BuildContext context, index) {
                           var data = v.viewAllCareTakers[index];
-                          var fullName =
-                              '${data.firstName ?? ''} ${data.lastName ?? ''}'
-                                  .trim();
-                          return CustomCareTakers(
-                            name: fullName,
-                            hospital: "Ak hospital",
-                            initial: 2,
-                            imageUrl: "assets/images/Rectangle 4481.png",
+                          return Padding(
+                            padding: EdgeInsets.symmetric(vertical: 3.h),
+                            child: CustomCareTakers(
+                              name: '${data.caretakerInfo!.firstName} ${data.caretakerInfo!.lastName}' ?? '',
+                              hospital: "Ak hospital",
+                              initial: 2,
+                              imageUrl: 'https://care2carevital.us/public/storage/profile_images/caretakers/${data.profileImageUrl}',
+                            ),
                           );
                         });
                   }),
@@ -242,8 +269,6 @@ class HomePage extends StatelessWidget {
       );
     });
   }
-
-// custom TopCareTaker
 }
 
 // Custom Stateless Widget
@@ -282,7 +307,7 @@ class CustomCareTakers extends StatelessWidget {
             height: MediaQuery.of(context).size.height,
             width: 68.w,
             color: AppColors.secondaryColor,
-            child: Image.asset(imageUrl ?? ''),
+            child:Image.network(fit: BoxFit.cover,imageUrl ?? ''),
           ),
           kWidth10,
           Column(

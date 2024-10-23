@@ -27,9 +27,10 @@ class _MobileEmailState extends State<MobileEmail> {
     return CustomBackground(
       child: Column(
         children: [
+          kHeight20,
           Expanded(
-              flex: 2, child: Image.asset("assets/images/ctoc onboarding.png")),
-          kHeight40,
+              flex: 2, child: Image.asset("assets/images/Care taker wlkthrgh img.png")),
+          kHeight70,
           Flexible(
               //flex: 4,
               child: Column(
@@ -51,7 +52,7 @@ class _MobileEmailState extends State<MobileEmail> {
                         });
                       },
               ),
-              SizedBox(height: 15.h),
+              SizedBox(height: 30.h),
               Padding(
                 padding: EdgeInsets.symmetric(horizontal: 8.w),
                 child: SizedBox(
@@ -180,7 +181,7 @@ class LoginScreen extends StatelessWidget {
                   text: "Continue",
                   onPressed: v.isLoading
                       ? null
-                      : () => v.loginorRegister(context: context),
+                      : () =>v.getFCMToken(context:context)
                 );
               }),
             ],

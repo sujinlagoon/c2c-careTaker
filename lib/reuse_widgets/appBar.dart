@@ -1,4 +1,3 @@
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -8,6 +7,8 @@ import 'package:iconly/iconly.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+
+import '../Notification/notification view.dart';
 
 class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   final String? title;
@@ -26,6 +27,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   @override
   Widget build(BuildContext context) {
     return AppBar(
+      scrolledUnderElevation: 0,
       backgroundColor: Colors.white,
       leading: leading ?? const SizedBox(),
       title: Text(
@@ -40,8 +42,8 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
 
   @override
   Size get preferredSize => Size.fromHeight(
-    kToolbarHeight + (bottom?.preferredSize.height ?? 0.0),
-  );
+        kToolbarHeight + (bottom?.preferredSize.height ?? 0.0),
+      );
 }
 
 class HomeAppBar extends StatelessWidget implements PreferredSizeWidget {
@@ -62,16 +64,14 @@ class HomeAppBar extends StatelessWidget implements PreferredSizeWidget {
     return PreferredSize(
       preferredSize: Size.fromHeight(100.0), // Adjust height as needed
       child: AppBar(
+        scrolledUnderElevation: 0,
         backgroundColor: Colors.white,
-        // Adjust to match your design
-       /* elevation: 0,*/
-        // Remove shadow for a flat design
+        elevation: 0,
         leading: Padding(
           padding: const EdgeInsets.only(left: 16.0, top: 8.0),
           child: CircleAvatar(
-            radius: 20.0, // Adjust size as needed
-            backgroundImage: NetworkImage(
-                avatarUrl), // Replace with AssetImage for local images
+            radius: 20.0,
+            backgroundImage: NetworkImage(avatarUrl),
           ),
         ),
         title: Column(
@@ -80,7 +80,7 @@ class HomeAppBar extends StatelessWidget implements PreferredSizeWidget {
             Text(
               'Hi, $username',
               style: TextStyle(
-                color: Colors.black, // Adjust to match your design
+                color: Colors.black,
                 fontSize: 18.0,
                 fontWeight: FontWeight.bold,
               ),
@@ -88,7 +88,7 @@ class HomeAppBar extends StatelessWidget implements PreferredSizeWidget {
             Text(
               subtitle,
               style: TextStyle(
-                color: Colors.grey, // Adjust to match your design
+                color: Colors.grey,
                 fontSize: 14.0,
               ),
             ),
@@ -98,19 +98,19 @@ class HomeAppBar extends StatelessWidget implements PreferredSizeWidget {
             [
               IconButton(
                 icon: Icon(IconlyLight.search, color: Colors.black),
-                // Adjust icon color
                 onPressed: () {
                   // Handle search action
                 },
               ),
               IconButton(
                 icon: Icon(IconlyLight.notification, color: Colors.black),
-                // Adjust icon color
+
                 onPressed: () {
+                  //Get.to(()=>NotificationPage());
                   //Get.to(()=>NotificationView());
                 },
               ),
-              SizedBox(width: 16.w), // Add some space at the end
+              SizedBox(width: 16.w),
             ],
       ),
     );

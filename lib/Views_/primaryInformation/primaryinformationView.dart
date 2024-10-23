@@ -7,15 +7,33 @@ import 'package:enefty_icons/enefty_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
-import 'package:get/get_core/src/get_main.dart';
 import 'package:iconly/iconly.dart';
 import 'package:readmore/readmore.dart';
 
 import '../../reuse_widgets/AppColors.dart';
 import '../../reuse_widgets/sizes.dart';
+import '../PatientRequest/controller/patient_request_controller.dart';
 
 class Primaryinformationview extends StatefulWidget {
-  Primaryinformationview({super.key});
+  String? firstName;
+  String? lastName;
+  String? sex;
+  int? age;
+  String? nationality;
+  String? imgUrl;
+  int? appointmentId;
+  int? patientId;
+
+  Primaryinformationview(
+      {super.key,
+      this.firstName,
+      this.lastName,
+      this.sex,
+      this.age,
+      this.imgUrl,
+      this.patientId,
+      this.appointmentId,
+      this.nationality});
 
   @override
   State<Primaryinformationview> createState() => _PrimaryinformationviewState();
@@ -24,21 +42,53 @@ class Primaryinformationview extends StatefulWidget {
 class _PrimaryinformationviewState extends State<Primaryinformationview> {
   String? selectedValue;
   final BottomNavController bn = Get.put(BottomNavController());
+  final PatientRequestController controller =
+      Get.put(PatientRequestController());
 
   @override
   Widget build(BuildContext context) {
     return CustomBackground(
-        bottomNavBar: Container(
-          height: 80.h,
-          color: Colors.white,
-          child: Center(
-            child: CustomButton(
-                text: "Accept Request",
-                onPressed: () {
-                  Get.back();
-                }),
-          ),
-        ),
+        bottomNavBar: GetBuilder<PatientRequestController>(builder: (request) {
+          return Container(
+            height: 80.h, // Adjust height as needed
+            color: Colors.white,
+            padding: EdgeInsets.symmetric(horizontal: 16.w),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Expanded(
+                  child: CustomButton(
+                    text: "Reject",
+                    color: Colors.red.withOpacity(0.9),
+                    onPressed: () {
+                      request.acceptRejectRequestApi(
+                          appointmentId: widget.appointmentId,
+                          patientId: widget.patientId,
+                          serviceStatus: "rejected");
+                      request.update();
+                      debugPrint('Request Rejected');
+                    },
+                  ),
+                ),
+                Expanded(
+                  child: CustomButton(
+                    text: "Accept",
+                    color: Colors.green.withOpacity(0.9),
+                    onPressed: () {
+                      request.acceptRejectRequestApi(
+                          appointmentId: widget.appointmentId,
+                          patientId: widget.patientId,
+                          serviceStatus: "approved");
+                      request.update();
+                      debugPrint('Request Accepted');
+                      Get.back();
+                    },
+                  ),
+                ),
+              ],
+            ),
+          );
+        }),
         appBar: CustomAppBar(
           title: "Primary Information",
         ),
@@ -48,9 +98,9 @@ class _PrimaryinformationviewState extends State<Primaryinformationview> {
             child: Column(
               children: [
                 carTakerList(context,
-                    doctorName: "Albertio",
-                    doctorState: "Us,California",
-                    imageUrl: "assets/images/female-nurse-hospital 1.png"),
+                    doctorName: '${widget.firstName}${widget.lastName}',
+                    doctorState: widget.nationality,
+                    imageUrl: widget.imgUrl),
                 kHeight15,
                 Container(
                   height: 35.h,
@@ -93,22 +143,15 @@ class _PrimaryinformationviewState extends State<Primaryinformationview> {
                     ),
                     trimMode: TrimMode.Line,
                     "It seems like you've entered readmore text nwithout completing the request. Could you please provide more details or clarify your query so I can assist you better?"),
+                Divider(
+                  thickness: 0.2,
+                ),
                 DocsCustom(
                   radiusSize: 26,
                   heading: "Experience Certificates",
                   message: "Add your career info",
                   icons: EneftyIcons.hospital_bold,
                   iconColor: Colors.orange,
-                ),
-                Divider(
-                  thickness: 0.2,
-                ),
-                DocsCustom(
-                  radiusSize: 26,
-                  heading: "Medical records",
-                  message: "History about your medical records",
-                  icons: EneftyIcons.ram_bold,
-                  iconColor: Colors.green,
                 ),
                 Divider(
                   thickness: 0.2,
@@ -232,7 +275,7 @@ class _PrimaryinformationviewState extends State<Primaryinformationview> {
               children: [
                 CircleAvatar(
                   radius: 28.r,
-                  backgroundImage: AssetImage(imageUrl ?? ''),
+                  backgroundImage: NetworkImage(imageUrl ?? ''),
                 ),
                 SizedBox(width: 10.w),
                 Expanded(
@@ -412,7 +455,11 @@ class DocsCustom extends StatelessWidget {
             ),
           ),
           IconButton(
-              onPressed: onTap, icon: Icon(Icons.arrow_forward_ios_rounded,size: 14.sp,))
+              onPressed: onTap,
+              icon: Icon(
+                Icons.arrow_forward_ios_rounded,
+                size: 14.sp,
+              ))
         ],
       ),
     );

@@ -64,15 +64,15 @@ class ProfileController extends GetxController {
     return age;
   }
 
-
   //indicate details fill Completed
 
   void onUserDetailsCompleted() {
     SharedPref().setRegisterComplete(true);
   }
 
-
   insertCaretakerProfileDetails() async {
+    isLoading = true;
+    update();
     try {
       var careTakerId = await SharedPref().getId();
       var token = await SharedPref().getToken();
@@ -84,8 +84,8 @@ class ProfileController extends GetxController {
         "age": int.parse(ageController.text),
         "dob": dobController.text,
         "email": emailCT.text,
-        "service_charge":costCT.text,
-        "total_patients_attended":totalPatientsCT.text,
+        "service_charge": costCT.text,
+        "total_patients_attended": totalPatientsCT.text,
         "medical_license": medicalLicenseController.text,
         "location": locationController.text,
         "nationality": nationalityController.text,
@@ -115,54 +115,60 @@ class ProfileController extends GetxController {
     } catch (e) {
       debugPrint(e.toString());
     }
+    isLoading = false;
+    update();
   }
 
   updateCaretakerProfileDetails() async {
-    //try {
-    var careTakerId = await SharedPref().getId();
-    var token = await SharedPref().getToken();
-    Map<String, dynamic> caretakerData = {
-      "caretaker_id": int.parse(careTakerId!),
-      "first_name": firstNameController.text,
-      "last_name": lastNameController.text,
-      "sex": sexController.text,
-      "age": int.parse(ageController.text),
-      "dob": dobController.text,
-      "email": emailCT.text,
-      "service_charge":costCT.text,
-      "total_patients_attended":totalPatientsCT.text,
-      "medical_license": medicalLicenseController.text,
-      "location": locationController.text,
-      "nationality": nationalityController.text,
-      "address": addressController.text,
-      "uploaded_documents": "sasasasasasasasasa",
-      "year_of_experiences": yearOfExperienceController.text,
-      "primary_contact_number": primaryContactController.text,
-      "secondary_contact_number": secondaryContactController.text
-    };
+    isLoading = true;
+    update();
 
-    var res = await http.put(
-      Uri.parse(URls().profileDetailsEdit),
-      body: jsonEncode(caretakerData),
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": "Bearer $token",
-      },
-    );
-    if (res.statusCode == 200) {
-      onUserDetailsCompleted();
-      Get.to(() => HomeView());
-      debugPrint("Successfully update care Taker Details");
-    } else {
-      debugPrint("Not Successfully update care Taker Details");
-    }
-    /*} catch (e) {
+    try {
+      var careTakerId = await SharedPref().getId();
+      var token = await SharedPref().getToken();
+      Map<String, dynamic> caretakerData = {
+        "caretaker_id": int.parse(careTakerId!),
+        "first_name": firstNameController.text,
+        "last_name": lastNameController.text,
+        "sex": sexController.text,
+        "age": int.parse(ageController.text),
+        "dob": dobController.text,
+        "email": emailCT.text,
+        "service_charge": costCT.text,
+        "total_patients_attended": totalPatientsCT.text,
+        "medical_license": medicalLicenseController.text,
+        "location": locationController.text,
+        "nationality": nationalityController.text,
+        "address": addressController.text,
+        "uploaded_documents": "sasasasasasasasasa",
+        "year_of_experiences": yearOfExperienceController.text,
+        "primary_contact_number": primaryContactController.text,
+        "secondary_contact_number": secondaryContactController.text
+      };
+
+      var res = await http.put(
+        Uri.parse(URls().profileDetailsEdit),
+        body: jsonEncode(caretakerData),
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer $token",
+        },
+      );
+      if (res.statusCode == 200) {
+        onUserDetailsCompleted();
+        Get.to(() => HomeView());
+        debugPrint("Successfully update care Taker Details");
+      } else {
+        debugPrint("Not Successfully update care Taker Details");
+      }
+    } catch (e) {
       debugPrint(e.toString());
-    }*/
+    }
+    isLoading = false;
+    update();
   }
 
   bool fetchLoading = false;
-
 
   fetchCareTakerDetails() async {
     fetchLoading = true;
@@ -187,17 +193,21 @@ class ProfileController extends GetxController {
           lastNameController.text = profileInfo!.lastName ?? '';
           sexController.text = profileInfo!.sex ?? '';
           emailCT.text = profileInfo!.email ?? '';
-          costCT.text = profileInfo!.serviceCharge??"";
-          totalPatientsCT.text = profileInfo!.totalPatientsAttended??'';
-          dobController.text = DateFormat('yyyy-MM-dd').format(profileInfo!.dob!);
+          costCT.text = profileInfo!.serviceCharge ?? "";
+          totalPatientsCT.text = profileInfo!.totalPatientsAttended ?? '';
+          dobController.text =
+              DateFormat('yyyy-MM-dd').format(profileInfo!.dob!);
           locationController.text = profileInfo!.location ?? '';
           ageController.text = profileInfo!.age.toString();
           nationalityController.text = profileInfo!.nationality ?? '';
           medicalLicenseController.text = profileInfo!.medicalLicense ?? "";
-          yearOfExperienceController.text = profileInfo!.yearOfExperiences ?? '';
+          yearOfExperienceController.text =
+              profileInfo!.yearOfExperiences ?? '';
           addressController.text = profileInfo!.address ?? '';
-          primaryContactController.text = profileInfo!.primaryContactNumber ?? '';
-          secondaryContactController.text = profileInfo!.secondaryContactNumber ?? '';
+          primaryContactController.text =
+              profileInfo!.primaryContactNumber ?? '';
+          secondaryContactController.text =
+              profileInfo!.secondaryContactNumber ?? '';
           update();
         }
         /* } else {
@@ -287,7 +297,8 @@ class ProfileController extends GetxController {
       String? patientId = await SharedPref().getId();
       String? token = await SharedPref().getToken();
       String fileName = path.basename(selectImage!.path);
-      var req = await http.MultipartRequest('POST', Uri.parse(URls().uploadImage));
+      var req =
+          await http.MultipartRequest('POST', Uri.parse(URls().uploadImage));
       req.files.add(await http.MultipartFile.fromPath(
           'profile_image_url', selectImage!.path,
           filename: fileName));
@@ -312,8 +323,6 @@ class ProfileController extends GetxController {
     uploadLoading = false;
     update();
   }
-
-
 
   @override
   void onInit() {

@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "967281617059",
+    "project_id": "c2ctaker",
+    "storage_bucket": "c2ctaker.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:967281617059:android:c72a2660bfbf89949bf716",
+        "android_client_info": {
+          "package_name": "com.example.care2caretaker"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBPfnjGnbzOLUlYqWSPuOBz7vVSYAFblks"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

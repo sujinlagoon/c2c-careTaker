@@ -61,10 +61,18 @@ dependencies:
   firebase_core:
   firebase_auth:
   google_sign_in:
+  firebase_messaging:
   onscreen_num_keyboard: ^1.0.4
   image_picker:
   cached_network_image:
   shimmer:
+  file_picker:
+  open_filex: ^4.5.0
+  dio:
+  path_provider:
+  flutter_pdfview:
+  firebase_analytics:
+  flutter_local_notifications:
 
 
 dev_dependencies:

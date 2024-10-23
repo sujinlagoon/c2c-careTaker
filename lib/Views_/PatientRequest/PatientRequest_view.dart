@@ -1,3 +1,4 @@
+import 'package:care2caretaker/Views_/Profile/Controller/profileController.dart';
 import 'package:care2caretaker/reuse_widgets/AppColors.dart';
 import 'package:care2caretaker/reuse_widgets/appBar.dart';
 import 'package:care2caretaker/reuse_widgets/image_background.dart';
@@ -5,10 +6,11 @@ import 'package:care2caretaker/reuse_widgets/sizes.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
-import 'package:get/get_core/src/get_main.dart';
 import 'package:iconly/iconly.dart';
+import 'package:shimmer/shimmer.dart';
 
 import '../primaryInformation/primaryinformationView.dart';
+import 'controller/patient_request_controller.dart';
 
 class PatientrequestView extends StatelessWidget {
   const PatientrequestView({super.key});
@@ -17,18 +19,12 @@ class PatientrequestView extends StatelessWidget {
   Widget build(BuildContext context) {
     return CustomBackground(
       appBar: CustomAppBar(
-        title: "Patient Request",
+        title: "Request From Patients",
       ),
       child: Padding(
         padding: EdgeInsets.symmetric(horizontal: 15.r),
-        child:  Column(
-          children: [
-            InkWell(
-                onTap:(){
-
-                  Get.to(()=>Primaryinformationview());
-                },child: CustomPatientRequest()),
-          ],
+        child: SingleChildScrollView(
+          child: CustomPatientRequest(),
         ),
       ),
     );
@@ -36,60 +32,103 @@ class PatientrequestView extends StatelessWidget {
 }
 
 class CustomPatientRequest extends StatelessWidget {
-  const CustomPatientRequest({super.key});
+  CustomPatientRequest({super.key});
+
+  PatientRequestController controller = Get.put(PatientRequestController());
+  ProfileController contro = Get.put(ProfileController());
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      height: MediaQuery.of(context).size.height * 0.28,
-      width: MediaQuery.of(context).size.width,
-      decoration: BoxDecoration(
-        color: AppColors.primaryColor,
-        borderRadius: BorderRadius.circular(12.r),
-      ),
-      child: Stack(
-        children: [
-          // Blue container (background)
-          Container(
-            decoration: BoxDecoration(
-              color: AppColors.primaryColor,
-              borderRadius: BorderRadius.circular(12.r),
-            ),
-            child: const Padding(
-              padding: EdgeInsets.only(bottom: 8.0),
-              child: Align(
-                alignment: Alignment.bottomCenter,
-                child: Text(
-                  "Accept Request",
-                  style: TextStyle(
-                      color: Colors.white, fontWeight: FontWeight.bold),
+    return GetBuilder<PatientRequestController>(builder: (v) {
+      if (v.caretakersList.isEmpty) {
+        return Center(child: ShimmerLoaderShimmer());
+      }
+      return SizedBox(
+        height: MediaQuery.of(context).size.height,
+        child: ListView.builder(
+            itemCount: v.caretakersList.length,
+            itemBuilder: (BuildContext context, int index) {
+              print(v.caretakersList.length);
+              var res = v.caretakersList[index];
+              var path = v.careTakersListResponse!.profilePath;
+              var data = res.patient!.patientInfo;
+              if (data == null) {
+                return const Center(child: Text('No patient data available'));
+              }
+              print('-----${data.firstName}');
+              return Padding(
+                padding: EdgeInsets.symmetric(vertical: 3.h),
+                child: Container(
+                  height: MediaQuery.of(context).size.height * 0.28,
+                  width: MediaQuery.of(context).size.width,
+                  decoration: BoxDecoration(
+                    color: AppColors.primaryColor,
+                    borderRadius: BorderRadius.circular(12.r),
+                  ),
+                  child: Stack(
+                    children: [
+                      // Blue container (background)
+                      InkWell(
+                        onTap: () {
+                          Get.to(() => Primaryinformationview(
+                              age: data.age,
+                              sex: data.sex,
+                              firstName: data.firstName,
+                              lastName: data.lastName,
+                              nationality: data.nationality,
+                              appointmentId: res.id,
+                              patientId: res.patientId,
+                              imgUrl: '${path}${res.patient!.profileImageUrl}'));
+                        },
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: AppColors.primaryColor,
+                            borderRadius: BorderRadius.circular(12.r),
+                          ),
+                          child: const Padding(
+                            padding: EdgeInsets.only(bottom: 8.0),
+                            child: Align(
+                              alignment: Alignment.bottomCenter,
+                              child: Text(
+                                "View Request",
+                                style: TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                      // White container (overlay)
+                      Positioned(
+                        bottom: 31.h,
+                        child: Container(
+                          height: MediaQuery.of(context).size.height * 0.24,
+                          width: MediaQuery.of(context).size.width * 0.96,
+                          decoration: BoxDecoration(
+                            color: const Color(0xffF6F4F4),
+                            borderRadius: BorderRadius.circular(12.r),
+                          ),
+                          child: GetBuilder<PatientRequestController>(
+                              builder: (v) {
+                            return carTakerList(context, controller,
+                                imageUrl:
+                                    '${path}${res.patient!.profileImageUrl}',
+                                doctorName: '${data.firstName}');
+                          }),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-            ),
-          ),
-          // White container (overlay)
-          Positioned(
-            bottom: 31.h,
-            child: Container(
-              height: MediaQuery.of(context).size.height * 0.24,
-              width: MediaQuery.of(context).size.width * 0.96,
-              decoration: BoxDecoration(
-                color: const Color(0xffF6F4F4),
-                borderRadius: BorderRadius.circular(12.r),
-              ),
-              child: carTakerList(context,
-                  imageUrl: 'assets/images/female-nurse-hospital 1.png',
-                  doctorState: "US",
-                  doctorName: "Albretha"),
-            ),
-          ),
-        ],
-      ),
-    );
+              );
+            }),
+      );
+    });
   }
 }
 
-Widget carTakerList(BuildContext context,
+Widget carTakerList(BuildContext context, PatientRequestController controllerd,
     {String? name,
     String? doctorName,
     String? doctorDesignation,
@@ -115,7 +154,7 @@ Widget carTakerList(BuildContext context,
             children: [
               CircleAvatar(
                 radius: 28.r,
-                backgroundImage: AssetImage(imageUrl ?? ''),
+                backgroundImage: NetworkImage(imageUrl ?? ''),
               ),
               SizedBox(width: 10.w),
               Expanded(
@@ -218,4 +257,50 @@ Widget Circleso(BuildContext context, {IconData? icon, String? name}) {
       )
     ],
   );
+}
+
+class ShimmerLoaderShimmer extends StatelessWidget {
+  const ShimmerLoaderShimmer({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Shimmer.fromColors(
+      baseColor: Colors.grey[300]!,
+      highlightColor: Colors.grey[100]!,
+      child: Padding(
+          padding: EdgeInsets.symmetric(vertical: 8.0),
+          child: SizedBox(
+            height: MediaQuery.of(context).size.height,
+            child: ListView.builder(
+                itemCount: 3,
+                itemBuilder: (BuildContext context, int index) {
+                  return Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 8.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Container(
+                          width: double.infinity,
+                          height: 20.0,
+                          color: Colors.white,
+                        ),
+                        SizedBox(height: 10),
+                        Container(
+                          width: 150.0,
+                          height: 20.0,
+                          color: Colors.white,
+                        ),
+                        SizedBox(height: 10),
+                        Container(
+                          width: double.infinity,
+                          height: 150.0,
+                          color: Colors.white,
+                        ),
+                      ],
+                    ),
+                  );
+                }),
+          )),
+    );
+  }
 }
