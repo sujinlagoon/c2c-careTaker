@@ -29,7 +29,8 @@ class _MobileEmailState extends State<MobileEmail> {
         children: [
           kHeight20,
           Expanded(
-              flex: 2, child: Image.asset("assets/images/Care taker wlkthrgh img.png")),
+              flex: 2,
+              child: Image.asset("assets/images/Care taker wlkthrgh img.png")),
           kHeight70,
           Flexible(
               //flex: 4,
@@ -130,7 +131,7 @@ class LoginScreen extends StatelessWidget {
                     textAlign: TextAlign.center,
                     maxLines: 1,
                     style:
-                    TextStyle(fontSize: 22.sp, fontWeight: FontWeight.w700),
+                        TextStyle(fontSize: 22.sp, fontWeight: FontWeight.w700),
                   )),
               SizedBox(height: 20.h),
               SizedBox(
@@ -176,13 +177,12 @@ class LoginScreen extends StatelessWidget {
               GetBuilder<LoginController>(builder: (v) {
                 print(v.phoneCT.text);
                 return CustomButton(
-                  isLoading: v.isLoading,
-                  width: MediaQuery.of(context).size.width * 0.8,
-                  text: "Continue",
-                  onPressed: v.isLoading
-                      ? null
-                      : () =>v.getFCMToken(context:context)
-                );
+                    isLoading: v.isLoading,
+                    width: MediaQuery.of(context).size.width * 0.8,
+                    text: "Continue",
+                    onPressed: v.isLoading
+                        ? null
+                        : () => v.loginorRegister(context: context));
               }),
             ],
           ),

@@ -19,37 +19,53 @@ class LoginController extends GetxController {
   bool isLoading = false;
   CountryCode? countryCode = CountryCode.fromDialCode('+91');
   int? getOtp;
-
   String? fcmToken;
 
-  void getFCMToken({required BuildContext context}) async {
-    FirebaseMessaging messaging = FirebaseMessaging.instance;
-
-    NotificationSettings settings = await messaging.requestPermission(
-      alert: true,
-      badge: true,
-      sound: true,
-    );
-
-    if (settings.authorizationStatus == AuthorizationStatus.authorized) {
-      try {
-        String? token = await messaging.getToken();
-        if (token != null) {
-          print("FCM Token: $token");
-          fcmToken = token;
-          loginorRegister(context: context);
-          update();
-        } else {
-          print("FCM Token is null");
-        }
-      } catch (e) {
-        print("Error retrieving FCM token: $e");
-      }
-    } else {
-      print("User declined notification permissions");
+  Future<void> getFcmToken() async {
+    try {
+      await FirebaseMessaging.instance.deleteToken();
+      fcmToken = await FirebaseMessaging.instance.getToken();
+      print("Fetched FCM Token: $fcmToken");
+    } catch (e) {
+      print("Error fetching FCM Token: $e");
+      showCustomToast(
+          message: "Failed to retrieve FCM token. Please try again.");
     }
   }
 
+  Future<void> updateFCMTokenOnServer(String newToken) async {
+    try {
+      String? patientId = await SharedPref().getId();
+
+      if (patientId != null) {
+        var response = await http.post(
+          Uri.parse(URls().UpdateFCMToken),
+          body: {
+            'patient_id': patientId,
+            'fcm_token': newToken,
+          },
+          headers: {
+            "Content-Type": "application/json",
+          },
+        );
+
+        if (response.statusCode == 200) {
+          print("FCM Token updated successfully.");
+        } else {
+          print("Failed to update FCM Token: ${response.body}");
+        }
+      } else {
+        print("Patient ID is not available.");
+      }
+    } catch (e) {
+      print("Error updating FCM Token on server: $e");
+    }
+  }
+
+  /*Future<void> getFcmToken() async {
+    fcmToken = await FirebaseMessaging.instance.getToken();
+    print("Fetched FCM Token: $fcmToken");
+  }*/
   loginorRegister({required BuildContext context}) async {
     isLoading = true;
     update();
@@ -71,6 +87,7 @@ class LoginController extends GetxController {
       update();
       return;
     }
+    await getFcmToken();
     if (fcmToken == null) {
       showCustomToast(message: "FCM token is not available. Please try again.");
       isLoading = false;
@@ -197,6 +214,10 @@ class LoginController extends GetxController {
 
   @override
   void onInit() {
+    FirebaseMessaging.instance.onTokenRefresh.listen((newToken) {
+      updateFCMTokenOnServer(newToken);
+    });
+    //getFcmToken();
     super.onInit();
   }
 }

@@ -18,6 +18,20 @@ class SharedPref {
     debugPrint('Token retrieved: $token');
     return token;
   }
+  saveFCMToken(String fcmToken) async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setString('fcm_token', fcmToken);
+    debugPrint('FCM Token saved: $fcmToken');
+  }
+
+  Future<String?> getFCMToken() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? fcmToken = prefs.getString('fcm_token');
+    debugPrint('FCM Token retrieved: $fcmToken');
+    return fcmToken;
+  }
+
+
 
   saveId(String ID) async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();

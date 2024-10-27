@@ -1,14 +1,17 @@
 import 'dart:convert';
 import 'package:care2caretaker/api_urls/url.dart';
+import 'package:care2caretaker/reuse_widgets/customToast.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
+import 'package:url_launcher/url_launcher.dart';
 import '../../../sharedPref/sharedPref.dart';
 import '../modal/patientRequest_modal.dart';
 
 class PatientRequestController extends GetxController {
   List<Datum> caretakersList = [];
   CareTakersList? careTakersListResponse;
+  bool isLoading = false;
 
   loadRequests() async {
     String? token = await SharedPref().getToken();
@@ -16,6 +19,8 @@ class PatientRequestController extends GetxController {
       print('Token not found');
       return;
     }
+    isLoading = true;
+    update();
 
     try {
       var res = await http.get(
@@ -38,6 +43,8 @@ class PatientRequestController extends GetxController {
     } catch (e) {
       print('Error: $e');
     }
+    isLoading = false;
+    update();
   }
 
   acceptRejectRequestApi(
@@ -62,6 +69,8 @@ class PatientRequestController extends GetxController {
         final jsonResponse = jsonDecode(res.body);
         if (jsonResponse['success']) {
           debugPrint('Request $serviceStatus successfully');
+          showCustomToast(message: 'Request $serviceStatus successfully');
+
           Get.back();
         } else {
           debugPrint('Failed: ${jsonResponse['message']}');
@@ -70,6 +79,19 @@ class PatientRequestController extends GetxController {
         debugPrint('Error: ${res.statusCode}');
       }
     } catch (e) {}
+  }
+
+  Future<void> launchDialer(String phoneNumber) async {
+    final Uri telUri = Uri(
+      scheme: 'tel',
+      path: phoneNumber,
+    );
+    print(phoneNumber);
+    if (await canLaunchUrl(telUri)) {
+      await launchUrl(telUri);
+    } else {
+      throw 'Could not launch $telUri';
+    }
   }
 
   @override

@@ -24,4 +24,6 @@ class URls {
   String viewRequests = '$baseUrl/api/caretaker/caretaker/appointment-requests';
 
   String acceptRejectPatientRequest = '$baseUrl/api/caretaker/caretaker/approve-appointment';
+
+  String UpdateFCMToken = '$baseUrl/api/caretaker/update-token';
 }

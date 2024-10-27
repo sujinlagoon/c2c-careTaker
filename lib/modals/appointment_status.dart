@@ -1,21 +1,21 @@
 // To parse this JSON data, do
 //
-//     final careTakersList = careTakersListFromJson(jsonString);
+//     final appointmentStatus = appointmentStatusFromJson(jsonString);
 
 import 'dart:convert';
 
-CareTakersList careTakersListFromJson(String str) => CareTakersList.fromJson(json.decode(str));
+AppointmentStatus appointmentStatusFromJson(String str) => AppointmentStatus.fromJson(json.decode(str));
 
-String careTakersListToJson(CareTakersList data) => json.encode(data.toJson());
+String appointmentStatusToJson(AppointmentStatus data) => json.encode(data.toJson());
 
-class CareTakersList {
+class AppointmentStatus {
   bool? success;
   int? status;
   String? type;
   List<Datum>? data;
   String? profilePath;
 
-  CareTakersList({
+  AppointmentStatus({
     this.success,
     this.status,
     this.type,
@@ -23,7 +23,7 @@ class CareTakersList {
     this.profilePath,
   });
 
-  factory CareTakersList.fromJson(Map<String, dynamic> json) => CareTakersList(
+  factory AppointmentStatus.fromJson(Map<String, dynamic> json) => AppointmentStatus(
     success: json["success"],
     status: json["status"],
     type: json["type"],
@@ -53,8 +53,6 @@ class Datum {
   DateTime? updatedAt;
   Patient? patient;
 
-
-
   Datum({
     this.id,
     this.patientId,
@@ -67,7 +65,6 @@ class Datum {
     this.createdAt,
     this.updatedAt,
     this.patient,
-
   });
 
   factory Datum.fromJson(Map<String, dynamic> json) => Datum(
@@ -81,7 +78,6 @@ class Datum {
     paymentStatus: json["payment_status"],
     createdAt: json["created_at"] == null ? null : DateTime.parse(json["created_at"]),
     updatedAt: json["updated_at"] == null ? null : DateTime.parse(json["updated_at"]),
-
     patient: json["patient"] == null ? null : Patient.fromJson(json["patient"]),
   );
 
@@ -96,8 +92,6 @@ class Datum {
     "payment_status": paymentStatus,
     "created_at": createdAt?.toIso8601String(),
     "updated_at": updatedAt?.toIso8601String(),
-
-
     "patient": patient?.toJson(),
   };
 }
@@ -105,47 +99,47 @@ class Datum {
 class Patient {
   int? id;
   String? mobilenum;
+  String? fcmToken;
   String? otp;
   int? otpverified;
   String? profileImageUrl;
   DateTime? createdAt;
   DateTime? updatedAt;
   PatientInfo? patientInfo;
-  PatientSchedules? patientSchedules;
 
   Patient({
     this.id,
     this.mobilenum,
+    this.fcmToken,
     this.otp,
     this.otpverified,
     this.profileImageUrl,
     this.createdAt,
     this.updatedAt,
     this.patientInfo,
-    this.patientSchedules,
   });
 
   factory Patient.fromJson(Map<String, dynamic> json) => Patient(
     id: json["id"],
     mobilenum: json["mobilenum"],
+    fcmToken: json["fcm_token"],
     otp: json["otp"],
     otpverified: json["otpverified"],
     profileImageUrl: json["profile_image_url"],
     createdAt: json["created_at"] == null ? null : DateTime.parse(json["created_at"]),
     updatedAt: json["updated_at"] == null ? null : DateTime.parse(json["updated_at"]),
-    patientSchedules: json["patient_schedules"] == null ? null : PatientSchedules.fromJson(json["patient_schedules"]),
     patientInfo: json["patient_info"] == null ? null : PatientInfo.fromJson(json["patient_info"]),
   );
 
   Map<String, dynamic> toJson() => {
     "id": id,
     "mobilenum": mobilenum,
+    "fcm_token": fcmToken,
     "otp": otp,
     "otpverified": otpverified,
     "profile_image_url": profileImageUrl,
     "created_at": createdAt?.toIso8601String(),
     "updated_at": updatedAt?.toIso8601String(),
-    "patient_schedules": patientSchedules?.toJson(),
     "patient_info": patientInfo?.toJson(),
   };
 }
@@ -257,101 +251,6 @@ class PatientInfo {
     "specialist_name": specialistName,
     "specialist_contact_number": specialistContactNumber,
     "moreinfo": moreinfo,
-    "created_at": createdAt?.toIso8601String(),
-    "updated_at": updatedAt?.toIso8601String(),
-  };
-}
-class PatientSchedules {
-  int? id;
-  int? patientId;
-  String? patientDietplan;
-  String? patientActivitytype;
-  String? patientPastmedicalhistory;
-  String? patientPastsurgicalhistory;
-  String? patientBreakfasttime;
-  String? patientLunchtime;
-  String? patientSnackstime;
-  String? patientDinnertime;
-  String? patientMedications;
-  String? patientHydration;
-  String? patientOralcare;
-  String? patientBathing;
-  String? patientDressing;
-  String? patientToileting;
-  String? patientWalkingtime;
-  String? patientVitalsigns;
-  String? patientBloodsugar;
-  DateTime? createdAt;
-  DateTime? updatedAt;
-
-  PatientSchedules({
-    this.id,
-    this.patientId,
-    this.patientDietplan,
-    this.patientActivitytype,
-    this.patientPastmedicalhistory,
-    this.patientPastsurgicalhistory,
-    this.patientBreakfasttime,
-    this.patientLunchtime,
-    this.patientSnackstime,
-    this.patientDinnertime,
-    this.patientMedications,
-    this.patientHydration,
-    this.patientOralcare,
-    this.patientBathing,
-    this.patientDressing,
-    this.patientToileting,
-    this.patientWalkingtime,
-    this.patientVitalsigns,
-    this.patientBloodsugar,
-    this.createdAt,
-    this.updatedAt,
-  });
-
-  factory PatientSchedules.fromJson(Map<String, dynamic> json) => PatientSchedules(
-    id: json["id"],
-    patientId: json["patient_id"],
-    patientDietplan: json["patient_dietplan"],
-    patientActivitytype: json["patient_activitytype"],
-    patientPastmedicalhistory: json["patient_pastmedicalhistory"],
-    patientPastsurgicalhistory: json["patient_pastsurgicalhistory"],
-    patientBreakfasttime: json["patient_breakfasttime"],
-    patientLunchtime: json["patient_lunchtime"],
-    patientSnackstime: json["patient_snackstime"],
-    patientDinnertime: json["patient_dinnertime"],
-    patientMedications: json["patient_medications"],
-    patientHydration: json["patient_hydration"],
-    patientOralcare: json["patient_oralcare"],
-    patientBathing: json["patient_bathing"],
-    patientDressing: json["patient_dressing"],
-    patientToileting: json["patient_toileting"],
-    patientWalkingtime: json["patient_walkingtime"],
-    patientVitalsigns: json["patient_vitalsigns"],
-    patientBloodsugar: json["patient_bloodsugar"],
-    createdAt: json["created_at"] == null ? null : DateTime.parse(json["created_at"]),
-    updatedAt: json["updated_at"] == null ? null : DateTime.parse(json["updated_at"]),
-  );
-
-  Map<String, dynamic> toJson() => {
-    "id": id,
-    "patient_id": patientId,
-    "patient_dietplan": patientDietplan,
-    "patient_activitytype": patientActivitytype,
-    "patient_pastmedicalhistory": patientPastmedicalhistory,
-    "patient_pastsurgicalhistory": patientPastsurgicalhistory,
-    "patient_breakfasttime": patientBreakfasttime,
-    "patient_lunchtime": patientLunchtime,
-    "patient_snackstime": patientSnackstime,
-    "patient_dinnertime": patientDinnertime,
-    "patient_medications": patientMedications,
-    "patient_hydration": patientHydration,
-    "patient_oralcare": patientOralcare,
-    "patient_bathing": patientBathing,
-    "patient_dressing": patientDressing,
-    "patient_toileting": patientToileting,
-    "patient_walkingtime": patientWalkingtime,
-    "patient_vitalsigns": patientVitalsigns,
-    "patient_bloodsugar": patientBloodsugar,
     "created_at": createdAt?.toIso8601String(),
     "updated_at": updatedAt?.toIso8601String(),
   };

@@ -30,9 +30,10 @@ class AppointmentsContainer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: MediaQuery.of(context).size.height * 0.20,
+      height: MediaQuery.of(context).size.height * 0.22,
       width: MediaQuery.of(context).size.width,
       decoration: BoxDecoration(
+
           // color: AppColors.primaryColor.withOpacity(0.1),
           borderRadius: BorderRadius.circular(10.r),
           border: Border.all(width: 0.2, color: Colors.grey)),

@@ -2,12 +2,14 @@ import 'package:care2caretaker/Views_/HomeView/Controller/bottomNav_controller.d
 import 'package:care2caretaker/reuse_widgets/appBar.dart';
 import 'package:care2caretaker/reuse_widgets/customButton.dart';
 import 'package:care2caretaker/reuse_widgets/customLabel.dart';
+import 'package:care2caretaker/reuse_widgets/customToast.dart';
 import 'package:care2caretaker/reuse_widgets/image_background.dart';
 import 'package:enefty_icons/enefty_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:iconly/iconly.dart';
+import 'package:intl/intl.dart';
 import 'package:readmore/readmore.dart';
 
 import '../../reuse_widgets/AppColors.dart';
@@ -23,6 +25,14 @@ class Primaryinformationview extends StatefulWidget {
   String? imgUrl;
   int? appointmentId;
   int? patientId;
+  String? breakfast;
+  String? lunch;
+  String? dinner;
+  String? snacks;
+  String? BP;
+  String? patientContactNumber;
+  DateTime? sendDate;
+  DateTime? sendTime;
 
   Primaryinformationview(
       {super.key,
@@ -32,7 +42,15 @@ class Primaryinformationview extends StatefulWidget {
       this.age,
       this.imgUrl,
       this.patientId,
+      this.breakfast,
+      this.lunch,
+      this.dinner,
+      this.snacks,
       this.appointmentId,
+      this.BP,
+      this.sendTime,
+      this.sendDate,
+      this.patientContactNumber,
       this.nationality});
 
   @override
@@ -75,6 +93,8 @@ class _PrimaryinformationviewState extends State<Primaryinformationview> {
                     text: "Accept",
                     color: Colors.green.withOpacity(0.9),
                     onPressed: () {
+
+
                       request.acceptRejectRequestApi(
                           appointmentId: widget.appointmentId,
                           patientId: widget.patientId,
@@ -100,32 +120,41 @@ class _PrimaryinformationviewState extends State<Primaryinformationview> {
                 carTakerList(context,
                     doctorName: '${widget.firstName}${widget.lastName}',
                     doctorState: widget.nationality,
+                    //genderIcon: widget.sex,
+                    sendTime: widget.sendDate,
+                    sendDate: widget.sendTime,
+                    age: widget.age,
                     imageUrl: widget.imgUrl),
                 kHeight15,
-                Container(
-                  height: 35.h,
-                  width: 150.h,
-                  decoration: BoxDecoration(
-                      color: AppColors.primaryColor,
-                      borderRadius: BorderRadius.circular(23.r)),
-                  child: Padding(
-                    padding:
-                        EdgeInsets.symmetric(horizontal: 2.r, vertical: 5.r),
-                    child: Row(
-                      children: [
-                        CircleAvatar(
-                          backgroundColor: Colors.white,
-                          child: Icon(
-                            Icons.message_outlined,
-                            size: 15.sp,
+                InkWell(
+                  onTap: () {
+                    controller.launchDialer(widget.patientContactNumber!);
+                  },
+                  child: Container(
+                    height: 35.h,
+                    width: 150.h,
+                    decoration: BoxDecoration(
+                        color: AppColors.primaryColor,
+                        borderRadius: BorderRadius.circular(23.r)),
+                    child: Padding(
+                      padding:
+                          EdgeInsets.symmetric(horizontal: 2.r, vertical: 5.r),
+                      child: Row(
+                        children: [
+                          CircleAvatar(
+                            backgroundColor: Colors.white,
+                            child: Icon(
+                              Icons.message_outlined,
+                              size: 15.sp,
+                            ),
                           ),
-                        ),
-                        kWidth5,
-                        Text(
-                          "Contact Patient",
-                          style: TextStyle(color: Colors.white),
-                        )
-                      ],
+                          kWidth5,
+                          Text(
+                            "Contact Patient",
+                            style: TextStyle(color: Colors.white),
+                          )
+                        ],
+                      ),
                     ),
                   ),
                 ),
@@ -167,16 +196,16 @@ class _PrimaryinformationviewState extends State<Primaryinformationview> {
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         savedDetails(context,
-                            details: "BreakFast", timing: "8:00AM"),
+                            details: "BreakFast", timing: widget.breakfast),
                         kWidth5,
                         savedDetails(context,
-                            details: "lunch", timing: "12:00PM"),
+                            details: "lunch", timing: widget.lunch),
                         kWidth5,
                         savedDetails(context,
-                            details: "Snacks", timing: "04:00PM"),
+                            details: "Snacks", timing: widget.snacks),
                         kWidth5,
                         savedDetails(context,
-                            details: "Dinner", timing: "07:00PM"),
+                            details: "Dinner", timing: widget.dinner),
                       ],
                     ),
                   ),
@@ -213,14 +242,13 @@ class _PrimaryinformationviewState extends State<Primaryinformationview> {
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        savedDetails(context,
-                            details: "Morning", timing: "70mg"),
+                        savedDetails(context, details: "BP", timing: widget.BP),
                         kWidth5,
-                        savedDetails(context, details: "Noon", timing: "70mg"),
+                        /* savedDetails(context, details: "Noon", timing: "70mg"),
                         kWidth5,
                         savedDetails(context,
                             details: "Evening", timing: "70mg"),
-                        kWidth5,
+                        kWidth5,*/
                       ],
                     ),
                   ),
@@ -256,6 +284,11 @@ class _PrimaryinformationviewState extends State<Primaryinformationview> {
       String? doctorName,
       String? doctorDesignation,
       String? doctorState,
+      IconData? genderIcon,
+      int? age,
+      DateTime? sendDate,
+      DateTime? sendTime,
+      double? bmi,
       String? imageUrl}) {
     return Container(
       padding: EdgeInsets.all(10.r),
@@ -329,7 +362,7 @@ class _PrimaryinformationviewState extends State<Primaryinformationview> {
                 Align(
                   alignment: Alignment.topCenter,
                   child: Icon(
-                    Icons.female_outlined,
+                    genderIcon,
                     size: 33.sp,
                     color: Colors.pinkAccent,
                   ),
@@ -341,17 +374,104 @@ class _PrimaryinformationviewState extends State<Primaryinformationview> {
             thickness: 0.2,
           ),
           Container(
+            padding: EdgeInsets.zero,
             height:
                 MediaQuery.of(context).size.height * 0.09, // Adjusted height
             width: MediaQuery.of(context).size.width,
-            //color:Colors.red,
             child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              //mainAxisAlignment: MainAxisAlignment.spa,
               children: [
-                Circleso(context, icon: IconlyBold.user_2, name: "25yr Old"),
-                kWidth50,
-                Circleso(context, icon: IconlyBold.work, name: "Engineer"),
+                Expanded(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Icon(
+                            IconlyBold.user_2, // Icon for Age
+                            color: Colors.grey,
+                            size: 20.sp,
+                          ),
+                          SizedBox(width: 4.w), // Spacing between icon and text
+                          Text(
+                            "Age: $age", // Replace with actual age variable
+                            style: TextStyle(
+                              color: Colors.black,
+                              fontSize: 12.sp,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ],
+                      ),
+                      kHeight10,
+                      Row(
+                        children: [
+                          Icon(
+                            Icons.fitness_center, // Icon for BMI
+                            color: Colors.grey,
+                            size: 20.sp,
+                          ),
+                          SizedBox(width: 5.w), // Spacing between icon and text
+                          Text(
+                            "BMI: $bmi", // Replace with actual BMI variable
+                            style: TextStyle(
+                              color: Colors.black,
+                              fontSize: 12.sp,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+
+                // Right Side: Requested Time
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Icon(
+                            IconlyBold.calendar, // Icon for Date
+                            color: Colors.grey,
+                            size: 20.sp,
+                          ),
+                          SizedBox(width: 5.w), // Spacing between icon and text
+                          Text(
+                            "${DateFormat('yyyy-MM-dd').format(sendDate!)}",
+                            style: TextStyle(
+                              color: Colors.black,
+                              fontSize: 12.sp,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ],
+                      ),
+                      SizedBox(height: 5.h), // Spacing between date and time
+                      Row(
+                        children: [
+                          Icon(
+                            IconlyBold.time_circle, // Icon for Requested Time
+                            color: Colors.grey,
+                            size: 20.sp,
+                          ),
+                          SizedBox(width: 5.w), // Spacing between icon and text
+                          Text(
+                            "${DateFormat('hh:mm a').format(sendTime!)}",
+                            // Replace with actual time variable
+                            style: TextStyle(
+                              color: Colors.black,
+                              fontSize: 12.sp,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                )
               ],
             ),
           )
@@ -405,7 +525,7 @@ class DocsCustom extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: EdgeInsets.symmetric(vertical: 8.0),
+      padding: EdgeInsets.symmetric(vertical: 8.h),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         // Ensures the Row shrinks to fit its children
@@ -425,12 +545,11 @@ class DocsCustom extends StatelessWidget {
           Flexible(
             fit: FlexFit.tight,
             child: Container(
-              height: MediaQuery.of(context).size.height * 0.06,
+
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
-                  SizedBox(height: 5),
                   Text(
                     heading ?? "Alis Dia",
                     maxLines: 1,

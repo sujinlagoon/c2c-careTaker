@@ -73,6 +73,7 @@ dependencies:
   flutter_pdfview:
   firebase_analytics:
   flutter_local_notifications:
+  url_launcher:
 
 
 dev_dependencies:

@@ -102,7 +102,7 @@ class _HomePageState extends State<HomePage> {
                   ),
                   kHeight15,
                   Container(
-                    height: MediaQuery.of(context).size.height * 0.17,
+                    height: MediaQuery.of(context).size.height * 0.18,
                     width: MediaQuery.of(context).size.width,
                     decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(10.r),
@@ -143,12 +143,13 @@ class _HomePageState extends State<HomePage> {
                                         fontWeight: FontWeight.w500,
                                         fontSize: 17.sp),
                                   ),
-                                  kHeight10,
+                                  kHeight5,
                                   ClipRRect(
                                     child: BackdropFilter(
                                       filter: ImageFilter.blur(
                                           sigmaX: 3, sigmaY: 3),
                                       child: Container(
+                                        width: double.infinity,
                                         padding: EdgeInsets.all(3.r),
                                         decoration: BoxDecoration(
                                           gradient: LinearGradient(
@@ -156,21 +157,20 @@ class _HomePageState extends State<HomePage> {
                                               Colors.white.withOpacity(0.1),
                                               Colors.white.withOpacity(0.1),
                                             ],
-                                            /*begin: AlignmentDirectional.topStart,
-                                            end: AlignmentDirectional.bottomEnd,*/
                                           ),
                                           borderRadius: BorderRadius.all(
-                                              Radius.circular(2.r)),
+                                              Radius.circular(10.r)),
                                         ),
                                         child: Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.start,
+                                          // Align content to the start
                                           children: [
                                             Icon(
                                               IconlyLight.calendar,
                                               color: Colors.white,
                                             ),
-                                            SizedBox(
-                                              width: 5.w,
-                                            ),
+                                            SizedBox(width: 5.w),
                                             Text(
                                               "Aug 5  9:00AM",
                                               style: TextStyle(
@@ -216,7 +216,6 @@ class _HomePageState extends State<HomePage> {
                   ),
                   kHeight10,
                   GetBuilder<HomeController>(builder: (v) {
-
                     return ListView.builder(
                         shrinkWrap: true,
                         physics: NeverScrollableScrollPhysics(),
@@ -226,10 +225,13 @@ class _HomePageState extends State<HomePage> {
                           return Padding(
                             padding: EdgeInsets.symmetric(vertical: 3.h),
                             child: CustomCareTakers(
-                              name: '${data.caretakerInfo!.firstName} ${data.caretakerInfo!.lastName}' ?? '',
+                              name:
+                                  '${data.caretakerInfo!.firstName} ${data.caretakerInfo!.lastName}' ??
+                                      '',
                               hospital: "Ak hospital",
                               initial: 2,
-                              imageUrl: 'https://care2carevital.us/public/storage/profile_images/caretakers/${data.profileImageUrl}',
+                              imageUrl:
+                                  'https://care2carevital.us/public/storage/profile_images/caretakers/${data.profileImageUrl}',
                             ),
                           );
                         });
@@ -291,7 +293,7 @@ class CustomCareTakers extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: MediaQuery.of(context).size.height * 0.10,
+      height: MediaQuery.of(context).size.height * 0.12,
       width: MediaQuery.of(context).size.width,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(10.r),
@@ -307,7 +309,7 @@ class CustomCareTakers extends StatelessWidget {
             height: MediaQuery.of(context).size.height,
             width: 68.w,
             color: AppColors.secondaryColor,
-            child:Image.network(fit: BoxFit.cover,imageUrl ?? ''),
+            child: Image.network(fit: BoxFit.cover, imageUrl ?? ''),
           ),
           kWidth10,
           Column(

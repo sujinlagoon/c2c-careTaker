@@ -225,6 +225,7 @@ class ProfileDetailsCustom extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
+
       padding: EdgeInsets.symmetric(vertical: 8.0),
       child: Row(
         children: [
@@ -242,7 +243,7 @@ class ProfileDetailsCustom extends StatelessWidget {
           kWidth10,
           Expanded(
             child: Container(
-              height: MediaQuery.of(context).size.height * 0.06,
+              height: MediaQuery.of(context).size.height * 0.07,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.start,
@@ -260,7 +261,7 @@ class ProfileDetailsCustom extends StatelessWidget {
                   ),
                   Text(
                     message ?? "sujnc901@gmail.com",
-                    maxLines: 2,
+                    maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: TextStyle(
                       fontSize: 12.sp,
