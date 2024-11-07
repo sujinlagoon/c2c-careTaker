@@ -34,19 +34,19 @@ class LoginController extends GetxController {
   }
 
   Future<void> updateFCMTokenOnServer(String newToken) async {
-    try {
+   /* try {*/
       String? patientId = await SharedPref().getId();
 
       if (patientId != null) {
         var response = await http.post(
           Uri.parse(URls().UpdateFCMToken),
           body: {
-            'patient_id': patientId,
+            'caretaker_id': patientId,
             'fcm_token': newToken,
           },
-          headers: {
+        /*  headers: {
             "Content-Type": "application/json",
-          },
+          },*/
         );
 
         if (response.statusCode == 200) {
@@ -57,9 +57,9 @@ class LoginController extends GetxController {
       } else {
         print("Patient ID is not available.");
       }
-    } catch (e) {
+ /*   } catch (e) {
       print("Error updating FCM Token on server: $e");
-    }
+    }*/
   }
 
   /*Future<void> getFcmToken() async {
@@ -100,12 +100,11 @@ class LoginController extends GetxController {
         'mobilenum': phoneCT.text,
         'fcm_token': fcmToken,
       });
-      print("phoneCT $phoneCT");
       if (result.statusCode == 200) {
         var responseBody = jsonDecode(result.body);
         int getOtp = responseBody['otp'];
         await SharedPref().saveOtp(getOtp.toString());
-        int patientId = responseBody['patient']['id'];
+        int patientId = responseBody['caretaker']['id'];
         await SharedPref().saveId(patientId.toString());
         debugPrint('your otp is : $getOtp');
         showCustomToast(message: "your otp is $getOtp");
@@ -118,7 +117,6 @@ class LoginController extends GetxController {
     }
     isLoading = false;
     update();
-    print("---->$isLoading");
   }
 
   googleSignInAccount() async {

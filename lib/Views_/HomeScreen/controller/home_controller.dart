@@ -29,7 +29,7 @@ class HomeController extends GetxController {
         viewAllCareTakers = allCareTakers!.data!;
         viewAllCareTakers.forEach((datum) {
           if (datum.caretakerInfo != null) {
-            print('Caretaker Name: ${datum.caretakerInfo?.firstName} ${datum.caretakerInfo?.lastName}');
+
           }
         });
       }

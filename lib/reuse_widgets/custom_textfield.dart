@@ -10,6 +10,7 @@ Widget customTextField(BuildContext context,
       Color? borderColor,
       Color? fillColor,
       double? height,
+      double?width,
       Widget? suffix,
       bool autofocus = false,
       bool obscureText = false,
@@ -34,8 +35,8 @@ Widget customTextField(BuildContext context,
     }) {
   return Container(
     height: height,
+    width: width,
     child: TextFormField(
-
       onChanged: onChanged,
       cursorWidth: 2,
       autofocus: autofocus,

@@ -23,7 +23,21 @@ class URls {
 
   String viewRequests = '$baseUrl/api/caretaker/caretaker/appointment-requests';
 
-  String acceptRejectPatientRequest = '$baseUrl/api/caretaker/caretaker/approve-appointment';
+  String acceptPatientRequest = '$baseUrl/api/caretaker/caretaker/approve-appointment';
+
+  String rejectPatientRequest = '$baseUrl/api/caretaker/caretaker/reject-appointment';
+
+  String loadRejectList = '$baseUrl/api/caretaker/caretaker/cancelled-appointments';
 
   String UpdateFCMToken = '$baseUrl/api/caretaker/update-token';
+
+  String allNotifications = '$baseUrl/api/caretaker/caretaker/notifications';
+
+  String markAllUnread =  '$baseUrl/api/caretaker/caretaker/notifications/mark-all-as-read';
+
+  String serviceHistory = '$baseUrl/api/caretaker/caretaker/create-service-history';
+
+  String ServiceHistory = '$baseUrl/api/caretaker/caretaker/get-service-history';
+
+
 }

@@ -32,13 +32,16 @@ class Primaryinformationview extends StatefulWidget {
   String? BP;
   String? patientContactNumber;
   DateTime? sendDate;
-  DateTime? sendTime;
+  String? sendTime;
+  String? toTime;
+  double? bmi;
 
   Primaryinformationview(
       {super.key,
       this.firstName,
       this.lastName,
       this.sex,
+      this.bmi,
       this.age,
       this.imgUrl,
       this.patientId,
@@ -49,6 +52,7 @@ class Primaryinformationview extends StatefulWidget {
       this.appointmentId,
       this.BP,
       this.sendTime,
+      this.toTime,
       this.sendDate,
       this.patientContactNumber,
       this.nationality});
@@ -76,13 +80,17 @@ class _PrimaryinformationviewState extends State<Primaryinformationview> {
               children: [
                 Expanded(
                   child: CustomButton(
+                    isLoading: request.isRejecting,
                     text: "Reject",
                     color: Colors.red.withOpacity(0.9),
                     onPressed: () {
-                      request.acceptRejectRequestApi(
-                          appointmentId: widget.appointmentId,
-                          patientId: widget.patientId,
-                          serviceStatus: "rejected");
+                      request.isRejecting = true;
+                      request.update();
+                      request.rejectRequestApi(
+                        appointmentId: widget.appointmentId,
+                        patientId: widget.patientId,
+                      );
+                      request.isRejecting = false;
                       request.update();
                       debugPrint('Request Rejected');
                     },
@@ -90,18 +98,19 @@ class _PrimaryinformationviewState extends State<Primaryinformationview> {
                 ),
                 Expanded(
                   child: CustomButton(
+                    isLoading: request.isAccepting,
                     text: "Accept",
                     color: Colors.green.withOpacity(0.9),
                     onPressed: () {
-
-
-                      request.acceptRejectRequestApi(
-                          appointmentId: widget.appointmentId,
-                          patientId: widget.patientId,
-                          serviceStatus: "approved");
+                      request.isAccepting = true;
                       request.update();
-                      debugPrint('Request Accepted');
-                      Get.back();
+                      request.acceptRequestApi(
+                        appointmentId: widget.appointmentId,
+                        patientId: widget.patientId,
+                      );
+                      request.isAccepting = false;
+                      request.update();
+                      debugPrint('Request Rejected');
                     },
                   ),
                 ),
@@ -121,9 +130,11 @@ class _PrimaryinformationviewState extends State<Primaryinformationview> {
                     doctorName: '${widget.firstName}${widget.lastName}',
                     doctorState: widget.nationality,
                     //genderIcon: widget.sex,
-                    sendTime: widget.sendDate,
-                    sendDate: widget.sendTime,
+                    sendTime: widget.toTime,
+                    sendDate: widget.sendDate,
                     age: widget.age,
+                    bmi: widget.bmi,
+                    toTime: widget.sendTime,
                     imageUrl: widget.imgUrl),
                 kHeight15,
                 InkWell(
@@ -287,7 +298,8 @@ class _PrimaryinformationviewState extends State<Primaryinformationview> {
       IconData? genderIcon,
       int? age,
       DateTime? sendDate,
-      DateTime? sendTime,
+      String? sendTime,
+      String? toTime,
       double? bmi,
       String? imageUrl}) {
     return Container(
@@ -459,7 +471,22 @@ class _PrimaryinformationviewState extends State<Primaryinformationview> {
                           ),
                           SizedBox(width: 5.w), // Spacing between icon and text
                           Text(
-                            "${DateFormat('hh:mm a').format(sendTime!)}",
+                            sendTime != null
+                                ? "${DateFormat('hh:mm a').format(DateTime.parse('${DateFormat('yyyy-MM-dd').format(sendDate)} $sendTime'))}"
+                                : 'Invalid Time',
+                            // Replace with actual time variable
+                            style: TextStyle(
+                              color: Colors.black,
+                              fontSize: 12.sp,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                          SizedBox(width: 5.w),
+                          Text("-"), SizedBox(width: 2.w),
+                          Text(
+                            toTime != null
+                                ? "${DateFormat('hh:mm a').format(DateTime.parse('${DateFormat('yyyy-MM-dd').format(sendDate)} $toTime'))}"
+                                : 'Invalid Time',
                             // Replace with actual time variable
                             style: TextStyle(
                               color: Colors.black,
@@ -545,7 +572,6 @@ class DocsCustom extends StatelessWidget {
           Flexible(
             fit: FlexFit.tight,
             child: Container(
-
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.start,

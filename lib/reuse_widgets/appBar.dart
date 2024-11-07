@@ -8,7 +8,9 @@ import 'package:iconly/iconly.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
+import '../Notification/controller/controller.dart';
 import '../Notification/notification view.dart';
+import '../Views_/Notifications/Notification_view.dart';
 
 class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   final String? title;
@@ -23,6 +25,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
     this.leading,
     this.bottom,
   }) : super(key: key);
+  NotificationController controller = Get.put(NotificationController());
 
   @override
   Widget build(BuildContext context) {
@@ -49,7 +52,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
 class HomeAppBar extends StatelessWidget implements PreferredSizeWidget {
   final String username;
   final String subtitle;
-  final String avatarUrl; // You can also use AssetImage for local images
+  final String avatarUrl;
   final List<Widget>? actions;
 
   HomeAppBar({
@@ -58,6 +61,7 @@ class HomeAppBar extends StatelessWidget implements PreferredSizeWidget {
     required this.avatarUrl,
     this.actions,
   });
+  NotificationController controller = Get.put(NotificationController());
 
   @override
   Widget build(BuildContext context) {
@@ -102,14 +106,21 @@ class HomeAppBar extends StatelessWidget implements PreferredSizeWidget {
                   // Handle search action
                 },
               ),
-              IconButton(
-                icon: Icon(IconlyLight.notification, color: Colors.black),
-
-                onPressed: () {
-                  //Get.to(()=>NotificationPage());
-                  //Get.to(()=>NotificationView());
-                },
-              ),
+              GetBuilder<NotificationController>(builder: (v) {
+                return Badge(
+                  offset: Offset(-5, 3),
+                  label: Text(v.unreadCount.toString()),
+                  child: IconButton(
+                    padding: EdgeInsets.zero,
+                    icon: Icon(IconlyLight.notification, color: Colors.black),
+                    // Adjust icon color
+                    onPressed: () {
+                      v.notificationsUnread();
+                      Get.to(() =>NotificationView());
+                    },
+                  ),
+                );
+              }),
               SizedBox(width: 16.w),
             ],
       ),

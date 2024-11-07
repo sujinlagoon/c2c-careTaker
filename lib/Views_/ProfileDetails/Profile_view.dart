@@ -16,14 +16,16 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
 import 'package:iconly/iconly.dart';
-
+import 'package:awesome_dialog/awesome_dialog.dart';
+import '../../Notification/controller/controller.dart';
+import '../Notifications/Notification_view.dart';
 import 'Information_view.dart';
 
 class ProfileDetails extends StatelessWidget {
   ProfileDetails({super.key});
 
   ProfileController controller = Get.put(ProfileController());
-
+  NotificationController notifyController = Get.put(NotificationController());
   @override
   Widget build(BuildContext context) {
     return GetBuilder<ProfileController>(builder: (v) {
@@ -31,10 +33,19 @@ class ProfileDetails extends StatelessWidget {
         appBar: CustomAppBar(
           title: "Profile Details",
           actions: [
-            IconButton(
-              onPressed: () {},
-              icon: const Icon(IconlyLight.notification),
-            ),
+            GetBuilder<NotificationController>(builder: (v) {
+              return Badge(
+                offset: Offset(-5, 3),
+                label: Text(v.unreadCount.toString()),
+                child: IconButton(
+                  padding: EdgeInsets.zero,
+                  onPressed: () {
+                    Get.to(() => NotificationView());
+                  },
+                  icon: const Icon(IconlyLight.notification),
+                ),
+              );
+            }),
           ],
         ),
         child: Padding(
@@ -128,7 +139,7 @@ class ProfileDetails extends StatelessWidget {
                 ProfileDetailsCustom(
                   icons: IconlyBold.profile,
                   iconColor: Color(0xff246AFD),
-                  heading: "Account Information",
+                  heading: "Profile Information",
                   message: "change Your Account Information ",
                   callback: () {
                     Get.to(() => AccountInformation());
@@ -146,46 +157,56 @@ class ProfileDetails extends StatelessWidget {
                   },
                 ),
                 Divider(),
-                kHeight10,
+             /*   kHeight10,
                 ProfileDetailsCustom(
                   icons: EneftyIcons.wallet_remove_bold,
                   iconColor: Colors.green,
                   heading: "Insurance Details",
                   message: "Add your Insurance Details",
                 ),
-                Divider(),
+                Divider(),*/
                 kHeight10,
                 ProfileDetailsCustom(
                   icons: Icons.picture_as_pdf,
                   iconColor: Colors.redAccent,
-                  heading: "Documents",
+                  heading: "My Documents",
                   message: "Upload or view Documents",
                   callback: () {
                     Get.to(() => DocumentUploadNew());
                   },
                 ),
-                Divider(),
-                kHeight10,
+             /*   kHeight10,
                 ProfileDetailsCustom(
                   icons: EneftyIcons.buildings_bold,
                   iconColor: Colors.amberAccent,
                   heading: "Medical Records",
                   message: "History about the your medical records",
-                ),
-                Divider(),
+                ),*/
+               /* Divider(),
                 kHeight10,
                 ProfileDetailsCustom(
                   icons: IconlyBold.location,
                   iconColor: Color(0xff076F88),
                   heading: "My Address",
                   message: "Add Your Address",
-                ),
+                ),*/
                 Divider(),
                 kHeight10,
                 ProfileDetailsCustom(
                   callback: () async {
-                    await SharedPref().logout();
-                    Get.offAll(() => MobileEmail());
+                    AwesomeDialog(
+                      context: context,
+                      dialogType: DialogType.noHeader,
+                      animType: AnimType.rightSlide,
+                      title: 'Are You Sure ',
+                      desc: ' Want to Logout',
+                      btnCancelOnPress: () {
+                        Get.back();
+                      },
+                      btnOkOnPress: () async {
+                        await SharedPref().logout();
+                      },
+                    )..show();
                   },
                   icons: EneftyIcons.logout_bold,
                   iconColor: Color(0xff002574),

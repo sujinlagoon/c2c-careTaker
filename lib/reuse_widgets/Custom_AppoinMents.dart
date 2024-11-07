@@ -9,8 +9,8 @@ class AppointmentsContainer extends StatelessWidget {
   final Color? statusColor;
   final String appointmentDate;
   final String appointmentTime;
-  final String doctorName;
-  final String doctorDesignation;
+  final String ?doctorName;
+  final String ?doctorDesignation;
   final String? action;
   final Color? actionColor;
   final IconData? actionIcon;
@@ -22,8 +22,8 @@ class AppointmentsContainer extends StatelessWidget {
       this.actionColor,
       required this.appointmentDate,
       required this.appointmentTime,
-      required this.doctorName,
-      required this.doctorDesignation,
+       this.doctorName,
+       this.doctorDesignation,
       this.action,
       this.actionIcon});
 
@@ -125,7 +125,7 @@ class AppointmentsContainer extends StatelessWidget {
                       children: [
                         CircleAvatar(
                           radius: 28.r,
-                          backgroundImage: AssetImage(imageUrl ?? ''),
+                          backgroundImage: NetworkImage(imageUrl ?? ''),
                         ),
                         SizedBox(width: 12.w),
                         Expanded(

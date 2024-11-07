@@ -1,6 +1,7 @@
 import 'dart:ui';
 
 import 'package:care2caretaker/Views_/HomeScreen/controller/home_controller.dart';
+import 'package:care2caretaker/Views_/PatientRequest/controller/patient_request_controller.dart';
 import 'package:care2caretaker/Views_/Profile/Controller/profileController.dart';
 import 'package:care2caretaker/modals/profilr_info_modal.dart';
 import 'package:custom_rating_bar/custom_rating_bar.dart';
@@ -12,6 +13,7 @@ import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
 import 'package:get/get_state_manager/src/simple/get_state.dart';
 import 'package:iconly/iconly.dart';
+import 'package:intl/intl.dart';
 import 'package:shimmer/shimmer.dart';
 
 import '../../reuse_widgets/AppColors.dart';
@@ -19,6 +21,7 @@ import '../../reuse_widgets/Custom_AppoinMents.dart';
 import '../../reuse_widgets/appBar.dart';
 import '../../reuse_widgets/customLabel.dart';
 import '../../reuse_widgets/sizes.dart';
+import '../PatientRequest/PatientRequest_view.dart';
 
 class HomePage extends StatefulWidget {
   HomePage({super.key});
@@ -31,6 +34,7 @@ class _HomePageState extends State<HomePage> {
   HomeController hm = Get.put(HomeController());
 
   ProfileController hc = Get.put(ProfileController());
+  PatientRequestController vc = Get.put(PatientRequestController());
 
   @override
   void initState() {
@@ -87,17 +91,35 @@ class _HomePageState extends State<HomePage> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Expanded(
-                        child: CustomLabel(
-                          text: "Upcoming Schedules",
-                          fontSize: 19.sp,
-                          fontWeight: FontWeight.bold,
+                        child: RichText(
+                          text: TextSpan(
+                            children: [
+                              TextSpan(
+                                text: "Welcome ",
+                                style: TextStyle(
+                                  fontSize: 19.sp,
+                                  color: Colors.black, // Default text color
+                                ),
+                              ),
+                              TextSpan(
+                                text: "CareTaker",
+                                style: TextStyle(
+                                  fontSize: 19.sp,
+                                  fontWeight: FontWeight.bold,
+                                  color: AppColors
+                                      .primaryColor, // CareTaker text color
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
                       ),
-                      CustomLabel(
+
+                      /*CustomLabel(
                         text: "See all",
                         fontSize: 15.sp,
                         color: AppColors.primaryColor,
-                      ),
+                      ),*/
                     ],
                   ),
                   kHeight15,
@@ -127,16 +149,16 @@ class _HomePageState extends State<HomePage> {
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  kHeight25,
+                                  kHeight35,
                                   Text(
-                                    "Miss.Alexa Nova",
+                                    "Your well-being is our priority. Trust us to provide the support you deserve",
                                     style: TextStyle(
                                         color: Colors.white,
                                         fontWeight: FontWeight.bold,
                                         fontSize: 17.sp),
                                   ),
                                   kHeight10,
-                                  Text(
+                                  /*     Text(
                                     "Physiotherapist",
                                     style: TextStyle(
                                         color: Colors.white,
@@ -180,7 +202,7 @@ class _HomePageState extends State<HomePage> {
                                         ),
                                       ),
                                     ),
-                                  )
+                                  )*/
                                 ],
                               ),
                             )),
@@ -202,41 +224,50 @@ class _HomePageState extends State<HomePage> {
                     children: [
                       Expanded(
                         child: CustomLabel(
-                          text: "Top CareTakers",
+                          text: "Upcoming Appointments",
                           fontSize: 19.sp,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-                      CustomLabel(
-                        text: "See all",
-                        fontSize: 15.sp,
-                        color: AppColors.primaryColor,
+                      InkWell(
+                        onTap: () {
+                          Get.to(() => PatientrequestView());
+                        },
+                        child: CustomLabel(
+                          text: "See all",
+                          fontSize: 15.sp,
+                          color: AppColors.primaryColor,
+                        ),
                       ),
                     ],
                   ),
                   kHeight10,
-                  GetBuilder<HomeController>(builder: (v) {
+                  GetBuilder<PatientRequestController>(builder: (v) {
                     return ListView.builder(
                         shrinkWrap: true,
                         physics: NeverScrollableScrollPhysics(),
-                        itemCount: v.viewAllCareTakers.length,
+                        itemCount: v.processingList.length > 4
+                            ? 4
+                            : v.processingList.length,
                         itemBuilder: (BuildContext context, index) {
-                          var data = v.viewAllCareTakers[index];
+                          var res = v.processingList[index];
+                          var path = v.careTakersListResponse!.profilePath;
+                          var data = res.patient!.patientInfo;
                           return Padding(
                             padding: EdgeInsets.symmetric(vertical: 3.h),
                             child: CustomCareTakers(
-                              name:
-                                  '${data.caretakerInfo!.firstName} ${data.caretakerInfo!.lastName}' ??
-                                      '',
-                              hospital: "Ak hospital",
-                              initial: 2,
+                              name: '${data!.firstName} ${data.lastName}' ?? '',
+                              age: data.age,
+                              appointmentDate: res.appointmentDate,
+                              gender: data.sex,
+                              //initial: 2,
                               imageUrl:
-                                  'https://care2carevital.us/public/storage/profile_images/caretakers/${data.profileImageUrl}',
+                                  '${path}${res.patient!.profileImageUrl}',
                             ),
                           );
                         });
                   }),
-                  kHeight10,
+                  /*     kHeight10,
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -261,7 +292,7 @@ class _HomePageState extends State<HomePage> {
                     doctorDesignation: "Ortho",
                     doctorName: "Sheeba",
                     imageUrl: 'assets/images/profile.jpg',
-                  ),
+                  ),*/
                   kHeight30,
                 ],
               ),
@@ -276,24 +307,51 @@ class _HomePageState extends State<HomePage> {
 // Custom Stateless Widget
 class CustomCareTakers extends StatelessWidget {
   final String? name;
-  final String? hospital;
+  final int? age;
   final String? imageUrl;
   final double initial;
+  String? gender;
+
+  DateTime? appointmentDate;
+  String? startTime;
+  String? endTime;
+  double? height;
   final VoidCallback? onPressed;
 
   // Constructor with named parameters
-  CustomCareTakers({
-    this.name,
-    this.imageUrl,
-    this.hospital,
-    this.initial = 3.0,
-    this.onPressed,
-  });
+  CustomCareTakers(
+      {this.name,
+      this.imageUrl,
+      this.age,
+      this.gender,
+      this.height,
+      this.initial = 3.0,
+      this.onPressed,
+      this.startTime,
+      this.endTime,
+      this.appointmentDate});
 
   @override
   Widget build(BuildContext context) {
+    // Convert startTime and endTime from String to DateTime
+    DateTime? startDateTime;
+    DateTime? endDateTime;
+
+    if (startTime != null) {
+      // Assuming startTime is in "HH:mm:ss" format
+      final List<String> startParts = startTime!.split(':');
+      startDateTime =
+          DateTime(0, 1, 1, int.parse(startParts[0]), int.parse(startParts[1]));
+    }
+
+    if (endTime != null) {
+      // Assuming endTime is in "HH:mm:ss" format
+      final List<String> endParts = endTime!.split(':');
+      endDateTime =
+          DateTime(0, 1, 1, int.parse(endParts[0]), int.parse(endParts[1]));
+    }
     return Container(
-      height: MediaQuery.of(context).size.height * 0.12,
+      height: height,
       width: MediaQuery.of(context).size.width,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(10.r),
@@ -305,11 +363,20 @@ class CustomCareTakers extends StatelessWidget {
       padding: EdgeInsets.all(6.r),
       child: Row(
         children: [
-          Container(
-            height: MediaQuery.of(context).size.height,
-            width: 68.w,
-            color: AppColors.secondaryColor,
-            child: Image.network(fit: BoxFit.cover, imageUrl ?? ''),
+          ClipRRect(
+            borderRadius: BorderRadius.circular(40),
+            // Adjust the radius as needed
+            child: Container(
+              //   height: MediaQuery.of(context).size.height*0.20,
+              width: 80.w,
+              color: AppColors.primaryColor,
+              child: Image.network(
+                height: MediaQuery.of(context).size.height * 0.10,
+                width: MediaQuery.of(context).size.width * 0.18,
+                fit: BoxFit.cover,
+                imageUrl ?? '',
+              ),
+            ),
           ),
           kWidth10,
           Column(
@@ -325,20 +392,42 @@ class CustomCareTakers extends StatelessWidget {
                 ),
               ),
               Text(
-                "Nurse : ${hospital ?? ''}",
+                "Age : ${age ?? ''}",
                 style: TextStyle(
                   color: Colors.black,
                   fontSize: 16.sp,
                 ),
               ),
-              RatingBar(
+              Text(
+                "Gender : ${gender ?? ''}",
+                style: TextStyle(
+                  color: Colors.black,
+                  fontSize: 16.sp,
+                ),
+              ),
+              Text(
+                "Appointment Date : ${appointmentDate != null ? DateFormat('MM/dd/yyyy').format(appointmentDate!) : ''}",
+                style: TextStyle(
+                  color: Colors.black,
+                  fontSize: 16.sp,
+                ),
+              ),
+              Text(
+                "Time: ${startTime != null ? DateFormat(' hh:mm a').format(startDateTime!) : ''} ${endTime != null ? DateFormat(' hh:mm a').format(endDateTime!) : ''}",
+                style: TextStyle(
+                  color: Colors.black,
+                  fontSize: 16.sp,
+                ),
+              ),
+
+              /*   RatingBar(
                 size: 23.sp,
                 filledIcon: Icons.star,
                 emptyIcon: Icons.star_border,
                 onRatingChanged: (value) => debugPrint('$value'),
                 initialRating: initial,
                 maxRating: 5,
-              ),
+              ),*/
             ],
           ),
         ],

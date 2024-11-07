@@ -2,16 +2,24 @@ import 'dart:convert';
 import 'package:care2caretaker/api_urls/url.dart';
 import 'package:care2caretaker/reuse_widgets/customToast.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:url_launcher/url_launcher.dart';
 import '../../../sharedPref/sharedPref.dart';
+import '../../Appointments/appointmentStaus_view.dart';
+import '../modal/getService_history.dart';
 import '../modal/patientRequest_modal.dart';
 
 class PatientRequestController extends GetxController {
   List<Datum> caretakersList = [];
   CareTakersList? careTakersListResponse;
   bool isLoading = false;
+  List<Datum> approvedList = [];
+  List<Datum> rejectedList = [];
+  List<Datum> requestList = [];
+  List<Datum> processingList = [];
+  List<Datum> completedList = [];
 
   loadRequests() async {
     String? token = await SharedPref().getToken();
@@ -34,7 +42,23 @@ class PatientRequestController extends GetxController {
       if (res.statusCode == 200) {
         careTakersListResponse = careTakersListFromJson(res.body);
         caretakersList.assignAll(careTakersListResponse!.data ?? []);
-        print("careTakerList ${caretakersList}");
+        approvedList.assignAll(caretakersList
+            .where((item) => item.serviceStatus == 'approved')
+            .toList());
+        /*   rejectedList.assignAll(caretakersList
+            .where((item) =>
+                item.serviceStatus == 'rejected' ||
+                item.serviceStatus == 'cancelled')
+            .toList());*/
+        requestList.assignAll(caretakersList
+            .where((item) => item.serviceStatus == 'requested')
+            .toList());
+        processingList.assignAll(caretakersList
+            .where((item) => item.serviceStatus == 'processing')
+            .toList());
+        completedList.assignAll(caretakersList
+            .where((item) => item.serviceStatus == 'completed')
+            .toList());
         update();
       } else {
         print(
@@ -47,17 +71,24 @@ class PatientRequestController extends GetxController {
     update();
   }
 
-  acceptRejectRequestApi(
-      {int? appointmentId, int? patientId, String? serviceStatus}) async {
+  bool isRejecting = false;
+  bool isAccepting = false;
+
+  acceptRequestApi({
+    int? appointmentId,
+    int? patientId,
+  }) async {
+    isAccepting = true;
+    update();
+
     try {
       String? token = await SharedPref().getToken();
       final Map<String, dynamic> bodyData = {
         "appointment_id": appointmentId,
         "patient_id": patientId,
-        "service_status": serviceStatus,
       };
-      var res = await http.put(
-        Uri.parse(URls().acceptRejectPatientRequest),
+      var res = await http.post(
+        Uri.parse(URls().acceptPatientRequest),
         body: jsonEncode(bodyData),
         headers: {
           'Authorization': 'Bearer $token',
@@ -67,18 +98,101 @@ class PatientRequestController extends GetxController {
 
       if (res.statusCode == 200) {
         final jsonResponse = jsonDecode(res.body);
-        if (jsonResponse['success']) {
-          debugPrint('Request $serviceStatus successfully');
-          showCustomToast(message: 'Request $serviceStatus successfully');
-
-          Get.back();
-        } else {
-          debugPrint('Failed: ${jsonResponse['message']}');
-        }
+        showCustomToast(message: "Successfully Accepted");
+        Get.to(() => AppointmentStatusView());
       } else {
         debugPrint('Error: ${res.statusCode}');
       }
-    } catch (e) {}
+    } catch (e) {
+      debugPrint('Error: $e');
+    }
+    isAccepting = false;
+    update();
+  }
+
+  rejectRequestApi({
+    int? appointmentId,
+    int? patientId,
+  }) async {
+    isRejecting = true;
+    update();
+
+    try {
+      String? token = await SharedPref().getToken();
+      final Map<String, dynamic> bodyData = {
+        "appointment_id": appointmentId,
+        "patient_id": patientId,
+      };
+      var res = await http.post(
+        Uri.parse(URls().rejectPatientRequest),
+        body: jsonEncode(bodyData),
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json',
+        },
+      );
+
+      if (res.statusCode == 200) {
+        final jsonResponse = jsonDecode(res.body);
+        showCustomToast(message: "Successfully Rejected");
+        Get.to(() => AppointmentStatusView());
+      } else {
+        debugPrint('Error: ${res.statusCode}');
+      }
+    } catch (e) {
+      debugPrint('Error: $e');
+    }
+    isRejecting = false;
+    update();
+  }
+
+  loadRejectList() async {
+    try {
+      String? token = await SharedPref().getToken();
+      var req = await http.get(
+        Uri.parse(URls().loadRejectList),
+        headers: {
+          'Authorization': 'Bearer $token',
+        },
+      );
+      if (req.statusCode == 200) {
+        careTakersListResponse = careTakersListFromJson(req.body);
+        rejectedList = careTakersListResponse!.data ?? [];
+        print("----------------------------->${rejectedList}");
+      } else {
+        debugPrint("Not load cancel req");
+      }
+    } catch (e) {
+      print(e);
+    }
+  }
+
+  ServiceHistory? serviceHistory;
+
+  loadGetHistory({int? appointmentId, int? patientId}) async {
+    try {
+      String? token = await SharedPref().getToken();
+      final uri = Uri.parse(URls().ServiceHistory).replace(queryParameters: {
+        "appointment_id": appointmentId?.toString(),
+        "patient_id": patientId?.toString(),
+      });
+
+      var res = await http.get(
+        uri,
+        headers: {
+          'Authorization': 'Bearer $token',
+        },
+      );
+
+      if (res.statusCode == 200) {
+        var data = json.decode(res.body);
+        serviceHistory = ServiceHistory.fromJson(data);
+      } else {
+        print('Failed to load history: ${res.statusCode}');
+      }
+    } catch (e) {
+      print('Error loading history: $e');
+    }
   }
 
   Future<void> launchDialer(String phoneNumber) async {

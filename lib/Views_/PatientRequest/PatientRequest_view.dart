@@ -14,7 +14,10 @@ import '../primaryInformation/primaryinformationView.dart';
 import 'controller/patient_request_controller.dart';
 
 class PatientrequestView extends StatelessWidget {
-  const PatientrequestView({super.key});
+  PatientrequestView({super.key});
+
+  final PatientRequestController controller =
+      Get.put(PatientRequestController());
 
   @override
   Widget build(BuildContext context) {
@@ -24,17 +27,17 @@ class PatientrequestView extends StatelessWidget {
       ),
       child: Padding(
         padding: EdgeInsets.symmetric(horizontal: 15.r),
-        child: CustomPatientRequest(),
+        child: CustomPatientRequest(controller: controller),
       ),
     );
   }
 }
 
 class CustomPatientRequest extends StatelessWidget {
-  CustomPatientRequest({super.key});
+  CustomPatientRequest({super.key, required this.controller});
 
-  PatientRequestController controller = Get.put(PatientRequestController());
-  ProfileController contro = Get.put(ProfileController());
+  final PatientRequestController controller;
+  final ProfileController profileController = Get.put(ProfileController());
 
   @override
   Widget build(BuildContext context) {
@@ -47,118 +50,115 @@ class CustomPatientRequest extends StatelessWidget {
           return ShimmerLoaderShimmer();
         }
 
-        if (v.caretakersList.isEmpty) {
-          return Center(child: Text("No Requests Found"));
+        if (v.requestList.isEmpty) {
+          return ListView(
+            physics: AlwaysScrollableScrollPhysics(),
+            children: [
+              Center(child: Text("No Requests Found")),
+            ],
+          );
         }
-        return controller.isLoading
-            ? ShimmerLoaderShimmer()
-            : RefreshIndicator(
-                onRefresh: () async {
-                  await controller.loadRequests();
-                },
-                child: ListView.builder(
-                    shrinkWrap: true,
-                    physics: AlwaysScrollableScrollPhysics(),
-                    itemCount: v.caretakersList.length,
-                    itemBuilder: (BuildContext context, int index) {
-                      var res = v.caretakersList[index];
-                      var path = v.careTakersListResponse!.profilePath;
-                      var data = res.patient!.patientInfo;
-                      var schedule = res.patient!.patientSchedules;
-                      if (data == null) {
-                        return const Center(
-                            child: Text('No patient data available'));
-                      }
-                      return Padding(
-                        padding: EdgeInsets.symmetric(vertical: 3.h),
-                        child: Container(
-                          height: MediaQuery.of(context).size.height * 0.20,
-                          width: MediaQuery.of(context).size.width,
-                          decoration: BoxDecoration(
-                            color: AppColors.primaryColor.withOpacity(0.3),
-                            
-                            borderRadius: BorderRadius.circular(12.r),
-                          ),
-                          child: Stack(
-                            children: [
-                              // Blue container (background)
-                              InkWell(
-                                onTap: () {
-                                  Get.to(
-                                    () => Primaryinformationview(
-                                      age: data.age,
-                                      sex: data.sex,
-                                      sendDate: data.createdAt,
-                                      sendTime: data.createdAt,
-                                      firstName: data.firstName,
-                                      lastName: data.lastName,
-                                      nationality: data.nationality,
-                                      appointmentId: res.id,
-                                      patientId: res.patientId,
-                                      patientContactNumber:
-                                          data.primaryContactNumber,
-                                      imgUrl:
-                                          '${path}${res.patient!.profileImageUrl}',
-                                      breakfast: schedule!.patientBreakfasttime,
-                                      dinner: schedule.patientDinnertime,
-                                      snacks: schedule.patientSnackstime,
-                                      lunch: schedule.patientLunchtime,
-                                      BP: schedule.patientBloodsugar,
-                                    ),
-                                  );
-                                },
-                                child: Container(
-                                  height: MediaQuery.of(context).size.height*0.20,
-                                  decoration: BoxDecoration(
-                                    color: AppColors.primaryColor.withOpacity(0.5),
-                                    borderRadius: BorderRadius.circular(12.r),
-                                  ),
-                                  child: const Padding(
-                                    padding: EdgeInsets.only(bottom: 8.0),
-                                    child: Align(
-                                      alignment: Alignment.bottomCenter,
-                                      child: Text(
-                                        "View Request",
-                                        style: TextStyle(
-                                            color: Colors.white,
-                                            fontWeight: FontWeight.bold),
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              // White container (overlay)
-                              Positioned(
-                               // bottom: 31.h,
-                                child: Container(
-                                  height: MediaQuery.of(context).size.height*0.16,
-                                  width: MediaQuery.of(context).size.width * 0.96,
-                                  decoration: BoxDecoration(
-                                    color: const Color(0xffF6F4F4),
-                                    borderRadius: BorderRadius.circular(12.r),
-                                  ),
-                                  child: GetBuilder<PatientRequestController>(
-                                      builder: (v) {
-                                    return carTakerList(
-                                        context, controller, index,
-                                        doctorState: data.nationality,
-                                        sendDate: data.createdAt,
-                                        doctorDesignation: "Patient",
-                                        bmi: data.bmi,
-                                        sendTime: data.createdAt,
-                                        imageUrl: '${path}${res.patient!.profileImageUrl}',
-                                        age: data.age,
-                                        doctorName:
-                                            '${data.firstName} ${data.lastName}');
-                                  }),
-                                ),
-                              ),
-                            ],
+
+        return ListView.builder(
+          shrinkWrap: true,
+          physics: AlwaysScrollableScrollPhysics(),
+          itemCount: v.requestList.length,
+          itemBuilder: (BuildContext context, int index) {
+            var res = v.requestList[index];
+            var path = v.careTakersListResponse!.profilePath;
+            var data = res.patient!.patientInfo;
+            var schedule = res.patient!.patientSchedules;
+
+            if (data == null) {
+              return const Center(child: Text('No patient data available'));
+            }
+
+            return Padding(
+              padding: EdgeInsets.symmetric(vertical: 3.h),
+              child: Container(
+                height: MediaQuery.of(context).size.height * 0.20,
+                width: MediaQuery.of(context).size.width,
+                decoration: BoxDecoration(
+                  color: AppColors.primaryColor.withOpacity(0.3),
+                  borderRadius: BorderRadius.circular(12.r),
+                ),
+                child: Stack(
+                  children: [
+                    InkWell(
+                      onTap: () {
+                        Get.to(() => Primaryinformationview(
+                              bmi: data.bmi,
+                              age: data.age,
+                              toTime: res.appointmentStartTime,
+                              sex: data.sex,
+                              sendDate: res.appointmentDate,
+                              sendTime: res.appointmentEndTime,
+                              firstName: data.firstName,
+                              lastName: data.lastName,
+                              nationality: data.nationality,
+                              appointmentId: res.id,
+                              patientId: res.patientId,
+                              patientContactNumber: data.primaryContactNumber,
+                              imgUrl: '${path}${res.patient!.profileImageUrl}',
+                              breakfast: schedule!.patientBreakfasttime,
+                              dinner: schedule.patientDinnertime,
+                              snacks: schedule.patientSnackstime,
+                              lunch: schedule.patientLunchtime,
+                              BP: schedule.patientBloodsugar,
+                            ));
+                      },
+                      child: Container(
+                        height: MediaQuery.of(context).size.height * 0.20,
+                        decoration: BoxDecoration(
+                          color: AppColors.primaryColor.withOpacity(0.5),
+                          borderRadius: BorderRadius.circular(12.r),
+                        ),
+                        child: const Padding(
+                          padding: EdgeInsets.only(bottom: 8.0),
+                          child: Align(
+                            alignment: Alignment.bottomCenter,
+                            child: Text(
+                              "View Request",
+                              style: TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold),
+                            ),
                           ),
                         ),
-                      );
-                    }),
-              );
+                      ),
+                    ),
+                    Positioned(
+                      child: Container(
+                        height: MediaQuery.of(context).size.height * 0.16,
+                        width: MediaQuery.of(context).size.width * 0.96,
+                        decoration: BoxDecoration(
+                          color: const Color(0xffF6F4F4),
+                          borderRadius: BorderRadius.circular(12.r),
+                        ),
+                        child:
+                            GetBuilder<PatientRequestController>(builder: (v) {
+                          return carTakerList(
+                            context,
+                            controller,
+                            index,
+                            doctorState: data.nationality,
+                            sendDate: data.createdAt,
+                            doctorDesignation: "Patient",
+                            bmi: data.bmi,
+                            sendTime: data.createdAt,
+                            imageUrl: '${path}${res.patient!.profileImageUrl}',
+                            age: data.age,
+                            doctorName: '${data.firstName} ${data.lastName}',
+                          );
+                        }),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          },
+        );
       }),
     );
   }
@@ -273,7 +273,7 @@ Widget carTakerList(
         const Divider(
           thickness: 0.2,
         ),
-       /* Container(
+        /* Container(
           padding: EdgeInsets.zero,
           height: MediaQuery.of(context).size.height * 0.09, // Adjusted height
           width: MediaQuery.of(context).size.width,

@@ -76,15 +76,25 @@ class WaitingPatients extends StatelessWidget {
   final String? name;
   final String? date;
   final String? time;
+  String? status;
+  int?appoinId;
+  int?patientId;
   final String? imgurl;
   VoidCallback? onTapButton;
+  VoidCallback? onTapDialog;
+  final bool? showIcon; // New parameter to control icon visibility
 
   WaitingPatients({
     this.name,
     this.date,
     this.imgurl,
     this.time,
+    this.patientId,
+    this.appoinId,
+    this.status,
+    this.onTapDialog,
     this.onTapButton,
+    this.showIcon = true,
   });
 
   @override
@@ -94,59 +104,76 @@ class WaitingPatients extends StatelessWidget {
       color: Colors.white,
       type: MaterialType.card,
       elevation: 2,
-      child: Container(
-        padding: EdgeInsets.all(6.r),
-        height: 80.h,
-        width: MediaQuery.of(context).size.width,
-        decoration: BoxDecoration(),
-        child: Stack(
-          children: [
-            Row(
-              children: [
-                Container(
-                  height: MediaQuery.of(context).size.height,
-                  width: 80.w,
-                  decoration: BoxDecoration(
-                    //border: Border.all(color: Colors.black, width: 0.2),
-                    borderRadius: BorderRadius.circular(3.r),
+      child: InkWell(
+        onTap: onTapDialog,
+        child: Container(
+          padding: EdgeInsets.all(6.r),
+          height: 80.h,
+          width: MediaQuery.of(context).size.width,
+          decoration: BoxDecoration(),
+          child: Stack(
+            children: [
+              Row(
+                children: [
+                  Container(
+                    height: MediaQuery.of(context).size.height,
+                    width: 80.w,
+                    decoration: BoxDecoration(
+                      //border: Border.all(color: Colors.black, width: 0.2),
+                      borderRadius: BorderRadius.circular(3.r),
+                    ),
+                    child: Image.network(imgurl ?? ''),
                   ),
-                  child: Image.asset(imgurl ?? ''),
-                ),
-                kWidth10,
-                Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      name ?? '',
-                      style: TextStyle(
-                          fontWeight: FontWeight.bold, fontSize: 17.sp),
-                    ),
-                    Text(
-                      date ?? '',
-                      style:
-                          TextStyle(fontSize: 13.sp, color: Color(0xffB9B9B9)),
-                    ),
-                    Text(
-                      time ?? '',
-                      style:
-                          TextStyle(fontSize: 13.sp, color: Color(0xffB9B9B9)),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-            Positioned(
-              top: -12,
-              right: -12,
-              child: IconButton(
-                onPressed: onTapButton,
-                icon: const Icon(Icons.more_vert_outlined),
+                  kWidth10,
+                  Column(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        name ?? '',
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold, fontSize: 17.sp),
+                      ),
+                      Text(
+                        date ?? '',
+                        style:
+                            TextStyle(fontSize: 13.sp, color: Color(0xffB9B9B9)),
+                      ),
+                      Text(
+                        time ?? '',
+                        style:
+                            TextStyle(fontSize: 13.sp, color: Color(0xffB9B9B9)),
+                      ),
+                    ],
+                  ),
+                ],
               ),
-            ),
-          ],
-        ),
-      ).paddingAll(8.r),
+              if (status != null)
+                Positioned(
+                  top: 8,
+                  right: showIcon == true ? 48 : 8,
+                  // Adjust position if icon is shown
+                  child: Text(
+                    '${status![0].toUpperCase()}${status!.substring(1)}',
+                    style: TextStyle(
+                        fontSize: 12.sp,
+                        color: Colors.green, // Customize color
+                        fontWeight: FontWeight.bold),
+                  ),
+                ),
+              if (showIcon!)
+                Positioned(
+                  top: -12,
+                  right: -12,
+                  child: IconButton(
+                    onPressed: onTapButton,
+                    icon: const Icon(Icons.more_vert_outlined),
+                  ),
+                ),
+            ],
+          ),
+        ).paddingAll(8.r),
+      ),
     );
   }
 }

@@ -24,173 +24,264 @@ class AccountInformation extends StatefulWidget {
 class _AccountInformationState extends State<AccountInformation> {
   final ProfileController controller = Get.put(ProfileController());
 
+  bool _hasChanges = false;
+
+  @override
+  void initState() {
+    super.initState();
+
+    // Set initial values for comparison
+    controller.firstNameController.addListener(_onFieldChanged);
+    controller.lastNameController.addListener(_onFieldChanged);
+    controller.sexController.addListener(_onFieldChanged);
+    controller.ageController.addListener(_onFieldChanged);
+    controller.dobController.addListener(_onFieldChanged);
+    controller.medicalLicenseController.addListener(_onFieldChanged);
+    controller.locationController.addListener(_onFieldChanged);
+    controller.nationalityController.addListener(_onFieldChanged);
+    controller.addressController.addListener(_onFieldChanged);
+    controller.yearOfExperienceController.addListener(_onFieldChanged);
+    controller.primaryContactController.addListener(_onFieldChanged);
+    controller.secondaryContactController.addListener(_onFieldChanged);
+    controller.costCT.addListener(_onFieldChanged);
+
+
+  }
+
+  @override
+  void dispose() {
+    // Dispose of controllers to prevent memory leaks
+    controller.firstNameController.removeListener(_onFieldChanged);
+    controller.lastNameController.removeListener(_onFieldChanged);
+    controller.sexController.removeListener(_onFieldChanged);
+    controller.ageController.removeListener(_onFieldChanged);
+    controller.dobController.removeListener(_onFieldChanged);
+    controller.medicalLicenseController.removeListener(_onFieldChanged);
+    controller.locationController.removeListener(_onFieldChanged);
+    controller.nationalityController.removeListener(_onFieldChanged);
+    controller.addressController.removeListener(_onFieldChanged);
+    controller.yearOfExperienceController.removeListener(_onFieldChanged);
+    controller.primaryContactController.removeListener(_onFieldChanged);
+    controller.secondaryContactController.removeListener(_onFieldChanged);
+    controller.costCT.removeListener(_onFieldChanged);
+    super.dispose();
+  }
+
+  void _onFieldChanged() {
+    setState(() {
+      _hasChanges = _hasFormChanged();
+    });
+  }
+
+  bool _hasFormChanged() {
+    return controller.firstNameController.text.trim() !=
+            controller.profileList?.data?.caretakerInfo?.firstName ||
+        controller.lastNameController.text.trim() !=
+            controller.profileList?.data?.caretakerInfo?.lastName ||
+        controller.sexController.text.trim() !=
+            controller.profileList?.data?.caretakerInfo?.sex ||
+        controller.ageController.text.trim() !=
+            controller.profileList?.data?.caretakerInfo?.age.toString() ||
+        controller.dobController.text.trim() !=
+            controller.profileList?.data?.caretakerInfo?.dob ||
+        controller.medicalLicenseController.text.trim() !=
+            controller.profileList?.data?.caretakerInfo?.medicalLicense ||
+        controller.costCT.text.trim() !=
+            controller.profileList?.data?.caretakerInfo?.serviceCharge.toString() ||
+        controller.locationController.text.trim() !=
+            controller.profileList?.data?.caretakerInfo?.location ||
+        controller.nationalityController.text.trim() !=
+            controller.profileList?.data?.caretakerInfo?.nationality ||
+        controller.addressController.text.trim() !=
+            controller.profileList?.data?.caretakerInfo?.address ||
+        controller.yearOfExperienceController.text.trim() !=
+            controller.profileList?.data?.caretakerInfo?.yearOfExperiences
+                .toString() ||
+        controller.primaryContactController.text.trim() !=
+            controller.profileList?.data?.caretakerInfo?.primaryContactNumber ||
+        controller.secondaryContactController.text.trim() !=
+            controller.profileList?.data?.caretakerInfo?.secondaryContactNumber;
+  }
+
+
   @override
   Widget build(BuildContext context) {
-    return GetBuilder<ProfileController>(
-      builder: (f) {
-        if (controller.fetchLoading) {
-          return Container(
-            height: MediaQuery.of(context).size.height,
-            color: Colors.white, // Set the background color you want
-            child: SkeletonLoader(),
-          );
-        }
+    return GetBuilder<ProfileController>(builder: (f) {
+      if (controller.fetchLoading) {
+        return Container(
+          height: MediaQuery.of(context).size.height,
+          color: Colors.white, // Set the background color you want
+          child: SkeletonLoader(),
+        );
+      }
 
-        /*if (controller.profileList?.data?.caretakerInfo == null && controller .profileList==null) {
-          return Center(child: Text("No data available or failed to fetch"));
-        }*/
-
-        var data = controller.profileList!.data!.caretakerInfo!;
-        return CustomBackground(
-          appBar: CustomAppBar(
-            title: 'Profile Information',
-            actions: [
-              Padding(
+      var data = controller.profileList!.data!.caretakerInfo!;
+      return CustomBackground(
+        appBar: CustomAppBar(
+          title: 'Profile Information',
+          actions: [
+            Padding(
                 padding: const EdgeInsets.only(right: 8.0),
-                child: Text(
-                  "Done",
-                  style: TextStyle(color: Colors.grey),
-                ),
-              ),
-            ],
-          ),
-          child: Padding(
-            padding: EdgeInsets.symmetric(horizontal: 12.w),
-            child: SingleChildScrollView(
-              child: Column(
+                child: TextButton(
+                  onPressed: _hasChanges
+                      ? () {
+                          controller.updateCaretakerProfileDetails();
+                        }
+                      : null,
+                  child: controller.isLoading
+                      ? SizedBox(
+                          height: 20,
+                          width: 20,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 0.4,
+                            color: AppColors.primaryColor,
+                          ),
+                        )
+                      : Text(
+                          "Update",
+                          style: TextStyle(
+                            color: _hasChanges
+                                ? AppColors.primaryColor
+                                : Colors.grey,
+                          ),
+                        ),
+                )),
+          ],
+        ),
+        child: Padding(
+          padding: EdgeInsets.symmetric(horizontal: 12.w),
+          child: SingleChildScrollView(
+            child: GetBuilder<ProfileController>(builder: (v) {
+              String fullImageUrl = (v.profileList?.profilePath ?? '') +
+                  (v.profileList?.data?.profileImage ?? '');
+              return Column(
                 children: [
-                  GetBuilder<ProfileController>(builder: (v) {
-                    String fullImageUrl = (v.profileList?.profilePath ?? '') +
-                        (v.profileList?.data?.profileImage ?? '');
-                    debugPrint(fullImageUrl);
-                    return Row(
-                      children: [
-                        Padding(
-                          padding: EdgeInsets.only(left: 8.w),
-                          child: CircleAvatar(
-                            radius: 24.r,
-                            backgroundColor: Colors.grey.shade200,
-                            child: ClipOval(
-                              child: CachedNetworkImage(
-                                imageUrl: fullImageUrl,
-                                placeholder: (context, url) =>
-                                    CircularProgressIndicator(),
-                                errorWidget: (context, url, error) =>
-                                    Image.asset('assets/images/remove_photo.png'),
-                                fit: BoxFit.cover,
-                                width: 46.r,
-                                height: 50.r,
-                              ),
+                  Row(
+                    children: [
+                      Padding(
+                        padding: EdgeInsets.only(left: 8.w),
+                        child: CircleAvatar(
+                          radius: 24.r,
+                          backgroundColor: Colors.grey.shade200,
+                          child: ClipOval(
+                            child: CachedNetworkImage(
+                              imageUrl: fullImageUrl,
+                              placeholder: (context, url) =>
+                                  CircularProgressIndicator(),
+                              errorWidget: (context, url, error) =>
+                                  Image.asset('assets/images/remove_photo.png'),
+                              fit: BoxFit.cover,
+                              width: 46.r,
+                              height: 50.r,
                             ),
                           ),
                         ),
-                        kWidth10,
-                        GetBuilder<ProfileController>(
-                            init: ProfileController(),
-                            builder: (v) {
-                              return Container(
-                                height: MediaQuery.of(context).size.height * 0.10,
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Text(
-                                      '${data!.firstName}  ${data.lastName}',
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
-                                      style: TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.black,
-                                      ),
+                      ),
+                      kWidth10,
+                      GetBuilder<ProfileController>(
+                          init: ProfileController(),
+                          builder: (v) {
+                            return Container(
+                              height: MediaQuery.of(context).size.height * 0.10,
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Text(
+                                    '${data!.firstName}  ${data.lastName}',
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.black,
                                     ),
-                                    SizedBox(height: 4),
-                                    GetBuilder<ProfileController>(
-                                      builder: (z) {
-                                        bool isLoading = false ;
-                                        return GestureDetector(
-                                          onTap: () {
-                                            z.selectImage = null;
-                                            z.profileList!.data!.profileImage = 'default-profile-img.png';
-                                            z.update();
-                                            debugPrint("Photo removed");
-                                          },
-                                          child: Text(
-                                            "Remove Photo",
-                                            maxLines: 2,
-                                            overflow: TextOverflow.ellipsis,
-                                            style: TextStyle(
-                                              fontSize: 14,
-                                              color: fullImageUrl.endsWith(
-                                                      'default-profile-img.png')
-                                                  ? Colors.black54
-                                                  : Colors.blue,
-                                            ),
-                                          ),
-                                        );
-                                      }
-                                    ),
-                                  ],
-                                ),
-                              );
-                            }),
-                        kWidth10,
-                        Padding(
-                          padding: EdgeInsets.only(top: 20.h),
-                          child: Align(
-                            alignment: Alignment.center,
-                            child: TextButton(
-                              onPressed: () {
-                                showModalBottomSheet(
-                                  context: context,
-                                  builder: (context) {
-                                    return Container(
-                                      height:
-                                          MediaQuery.of(context).size.height * 0.20,
-                                      width: MediaQuery.of(context).size.width,
-                                      color: Colors.white,
-                                      child: Column(
-                                        //crossAxisAlignment: CrossAxisAlignment.start,
-                                        children: [
-                                          TextButton(
-                                              onPressed: () {
-                                                v.pickImage(
-                                                    ImageSource.camera, context);
-                                              },
-                                              style: ButtonStyle(
-                                                  overlayColor:
-                                                      MaterialStatePropertyAll(
-                                                          Colors.transparent)),
-                                              child: AutoSizeText('Camera')),
-                                          TextButton(
-                                              onPressed: () {
-                                                v.pickImage(
-                                                    ImageSource.gallery, context);
-                                              },
-                                              style: ButtonStyle(
-                                                  overlayColor:
-                                                      MaterialStatePropertyAll(
-                                                          Colors.transparent)),
-                                              child: AutoSizeText('Gallery')),
-                                        ],
+                                  ),
+                                  SizedBox(height: 4),
+                                  GetBuilder<ProfileController>(builder: (z) {
+                                    bool isLoading = false;
+                                    return GestureDetector(
+                                      onTap: () {
+                                        z.selectImage = null;
+                                        z.profileList!.data!.profileImage =
+                                            'default-profile-img.png';
+                                        z.update();
+                                        debugPrint("Photo removed");
+                                      },
+                                      child: Text(
+                                        "Remove Photo",
+                                        maxLines: 2,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: TextStyle(
+                                          fontSize: 14,
+                                          color: fullImageUrl.endsWith(
+                                                  'default-profile-img.png')
+                                              ? Colors.black54
+                                              : Colors.blue,
+                                        ),
                                       ),
                                     );
-                                  },
-                                );
-                              },
-                              child: Text(
-                                'Change Photo',
-                                style: TextStyle(
-                                  color: Colors.blue,
-                                  fontSize: 14.sp,
-                                ),
+                                  }),
+                                ],
+                              ),
+                            );
+                          }),
+                      kWidth10,
+                      Padding(
+                        padding: EdgeInsets.only(top: 20.h),
+                        child: Align(
+                          alignment: Alignment.center,
+                          child: TextButton(
+                            onPressed: () {
+                              showModalBottomSheet(
+                                context: context,
+                                builder: (context) {
+                                  return Container(
+                                    height: MediaQuery.of(context).size.height *
+                                        0.20,
+                                    width: MediaQuery.of(context).size.width,
+                                    color: Colors.white,
+                                    child: Column(
+                                      //crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        TextButton(
+                                            onPressed: () {
+                                              v.pickImage(
+                                                  ImageSource.camera, context);
+                                            },
+                                            style: ButtonStyle(
+                                                overlayColor:
+                                                    MaterialStatePropertyAll(
+                                                        Colors.transparent)),
+                                            child: AutoSizeText('Camera')),
+                                        TextButton(
+                                            onPressed: () {
+                                              v.pickImage(
+                                                  ImageSource.gallery, context);
+                                            },
+                                            style: ButtonStyle(
+                                                overlayColor:
+                                                    MaterialStatePropertyAll(
+                                                        Colors.transparent)),
+                                            child: AutoSizeText('Gallery')),
+                                      ],
+                                    ),
+                                  );
+                                },
+                              );
+                            },
+                            child: Text(
+                              'Change Photo',
+                              style: TextStyle(
+                                color: Colors.blue,
+                                fontSize: 14.sp,
                               ),
                             ),
                           ),
                         ),
-                      ],
-                    );
-                  }),
+                      ),
+                    ],
+                  ),
                   kHeight20,
                   customTextField(
                     context,
@@ -230,6 +321,13 @@ class _AccountInformationState extends State<AccountInformation> {
                     labelText: "Medical License",
                   ),
                   kHeight15,
+                  customTextField(
+                    context,
+                    controller: controller.costCT,
+
+                    labelText: "Service Charge \$",
+                  ),
+                  kHeight15,
                   Row(
                     children: [
                       Expanded(
@@ -267,37 +365,37 @@ class _AccountInformationState extends State<AccountInformation> {
                     labelText: "Address",
                   ),
                   kHeight15,
-                  DottedBorder(
-                    color: AppColors.primaryColor,
-                    strokeWidth: 1,
-                    child: Container(
-                      height: MediaQuery.of(context).size.height * 0.10,
-                      width: MediaQuery.of(context).size.width,
-                      child: Column(
-                        children: [
-                          IconButton(
-                            padding: EdgeInsets.zero,
-                            onPressed: () {
-                              //Get.to(() => DocumentUploadView());
-                            },
-                            icon: Icon(EneftyIcons.attach_circle_outline),
-                          ),
-                          Text(
-                            "Add Attachment",
-                            style: TextStyle(color: AppColors.primaryColor),
-                          ),
-                        ],
+                  customTextField(
+                    context,
+                    controller: controller.yearOfExperienceController,
+                    labelText: "Experience",
+                  ),
+                  kHeight15,
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      customTextField(
+                        context,
+                        width: MediaQuery.of(context).size.width * 0.45,
+                        controller: controller.primaryContactController,
+                        labelText: "Primary ContactNumber",
                       ),
-                    ),
+                      customTextField(
+                        context,
+                        width: MediaQuery.of(context).size.width * 0.45,
+                        controller: controller.secondaryContactController,
+                        labelText: "Secondary ContactNumber",
+                      ),
+                    ],
                   ),
                   kHeight15,
                 ],
-              ),
-            ),
+              );
+            }),
           ),
-        );
-      }
-    );
+        ),
+      );
+    });
   }
 }
 
@@ -378,7 +476,8 @@ class SkeletonLoader extends StatelessWidget {
                   SizedBox(height: 15.h),
                   Row(
                     children: [
-                      Expanded(child: _buildSkeletonTextField()), // Location field
+                      Expanded(child: _buildSkeletonTextField()),
+                      // Location field
                       SizedBox(width: 15.w),
                       Container(
                         height: 40.h,
@@ -391,7 +490,8 @@ class SkeletonLoader extends StatelessWidget {
                   _buildSkeletonTextField(),
                   SizedBox(height: 15.h),
                   // Skeleton for the Address field
-                  _buildSkeletonTextField(height: 60.h), // Multiline address field
+                  _buildSkeletonTextField(height: 60.h),
+                  // Multiline address field
                   SizedBox(height: 15.h),
                   DottedBorder(
                     color: Colors.grey[300]!,
@@ -407,7 +507,8 @@ class SkeletonLoader extends StatelessWidget {
                           Container(
                             width: 100.w,
                             height: 20.h,
-                            color: Colors.grey[300], // Skeleton for "Add Attachment"
+                            color: Colors
+                                .grey[300], // Skeleton for "Add Attachment"
                           ),
                         ],
                       ),
@@ -423,7 +524,6 @@ class SkeletonLoader extends StatelessWidget {
     );
   }
 
-
   Widget _buildSkeletonTextField({
     double height = 20.0,
     double width = double.infinity,
@@ -437,6 +537,4 @@ class SkeletonLoader extends StatelessWidget {
       margin: margin,
     );
   }
-
 }
-
