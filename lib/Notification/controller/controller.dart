@@ -94,8 +94,7 @@ import '../modal/Notification_modal.dart';
 class NotificationController extends GetxController {
   FirebaseMessaging messaging = FirebaseMessaging.instance;
 
-  FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
-      FlutterLocalNotificationsPlugin();
+  FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
   var unreadCount = 0;
 
   @override
@@ -156,7 +155,7 @@ class NotificationController extends GetxController {
   // Initialize Local Notifications Plugin
   void initLocalNotifications() {
     const AndroidInitializationSettings initializationSettingsAndroid =
-        AndroidInitializationSettings('@mipmap/ic_launcher');
+        AndroidInitializationSettings('@mipmap/launcher_icon.png');
 
     final InitializationSettings initializationSettings =
         InitializationSettings(android: initializationSettingsAndroid);
@@ -229,7 +228,7 @@ class NotificationController extends GetxController {
       listNotification.addAll(receiveNotification!.notifications ?? []);
       unreadCount = receiveNotification!.unreadCount ?? 0;
       update();
-      print("Fetch Successfully ");
+      print("Fetch Successfully");
       update();
     } else {
       debugPrint("message fetch not successfully ");
