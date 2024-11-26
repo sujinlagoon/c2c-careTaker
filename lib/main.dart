@@ -7,13 +7,13 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'Views_/Notifications/Notification_view.dart';
-import 'Views_/Profile/Controller/profileController.dart';
 import 'Views_/SplashScreen/splash_screen.dart';
 import 'firebase_options.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
+    name: 'main',
     options: DefaultFirebaseOptions.currentPlatform,
   );
   Get.put(NotificationController());

@@ -88,6 +88,7 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:http/http.dart' as http;
 import '../../api_urls/url.dart';
+import '../../reuse_widgets/customToast.dart';
 import '../../sharedPref/sharedPref.dart';
 import '../modal/Notification_modal.dart';
 
@@ -157,8 +158,17 @@ class NotificationController extends GetxController {
     const AndroidInitializationSettings initializationSettingsAndroid =
         AndroidInitializationSettings('@mipmap/launcher_icon.png');
 
+
+    const DarwinInitializationSettings initializationSettingsIOS =
+    DarwinInitializationSettings(
+      requestAlertPermission: true,
+      requestBadgePermission: true,
+      requestSoundPermission: true,
+    );
     final InitializationSettings initializationSettings =
-        InitializationSettings(android: initializationSettingsAndroid);
+    InitializationSettings(
+        android: initializationSettingsAndroid,
+        iOS: initializationSettingsIOS);
 
     flutterLocalNotificationsPlugin.initialize(initializationSettings,
         onDidReceiveNotificationResponse:
@@ -258,5 +268,30 @@ class NotificationController extends GetxController {
     } else {}
     viewedNotification = false;
     update();
+  }
+
+
+  Future<void> deleteNotification(String notificationId) async {
+    String? token = await SharedPref().getToken();
+    try {
+      var res = await http.delete(
+        Uri.parse("${URls().deleteNotification}/$notificationId"),
+        headers: {
+          'Authorization': 'Bearer $token',
+        },
+      );
+
+      if (res.statusCode == 200) {
+        listNotification.removeWhere((notification) => notification.id == notificationId);
+        update();
+        showCustomToast(message: "Notification deleted successfully");
+      } else {
+        debugPrint("Failed to delete notification: ${res.body}");
+        showCustomToast(message: "Failed to delete notification");
+      }
+    } catch (e) {
+      debugPrint("Exception while deleting notification: $e");
+      showCustomToast(message: "An error occurred while deleting the notification");
+    }
   }
 }

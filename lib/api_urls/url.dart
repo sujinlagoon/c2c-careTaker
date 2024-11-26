@@ -40,4 +40,6 @@ class URls {
   String ServiceHistory = '$baseUrl/api/caretaker/caretaker/get-service-history';
 
   String deleteProfileImage = '$baseUrl/api/caretaker/caretaker/delete-profile-img';
+
+  String deleteNotification = '$baseUrl/api/caretaker/caretaker/delete-notification';
 }
